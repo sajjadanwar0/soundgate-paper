@@ -1,0 +1,162 @@
+# .github/workflows/release.yml
+#
+# Cross-platform wheels for `soundgate` (Linux x86_64/aarch64, macOS Intel/ARM,
+# Windows) + sdist, published to PyPI via Trusted Publishing (no stored token).
+#
+# The crate lives in the soundgate/ subdirectory of this repo, so every build
+# step sets working-directory: soundgate and builds with --features python.
+# abi3 (abi3-py38 in Cargo.toml) means one wheel per platform covers CPython 3.8+.
+#
+# ── One-time setup on PyPI ────────────────────────────────────────────────
+#   pypi.org → project `soundgate` → Publishing → Add a trusted publisher → GitHub
+#     Owner:            sajjadanwar0
+#     Repository:       soundgate-paper
+#     Workflow name:    release.yml
+#     Environment name: (leave BLANK to match this file as-is; see note at the
+#                        publish job if you want to use a GitHub Environment)
+#
+# ── How to use ────────────────────────────────────────────────────────────
+#   Rehearsal (build all platforms, NO publish): Actions → this workflow → Run workflow
+#     → download the artifacts to inspect, or `twine upload -r testpypi` them by hand.
+#   Real release: bump `version` in BOTH pyproject.toml and Cargo.toml (e.g. 0.1.1),
+#     then:  git commit -am "release: v0.1.1" && git tag v0.1.1 && git push origin main --tags
+#   (0.1.0 is already on PyPI and immutable — cross-platform wheels ship as a NEW version.)
+
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}      # manual run = cross-platform build rehearsal (publish job is skipped)
+
+permissions:
+  contents: read
+
+env:
+  CRATE_DIR: soundgate
+  MATURIN_ARGS: --release --out dist --features python
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: ${{ env.CRATE_DIR }}
+          target: ${{ matrix.target }}
+          args: ${{ env.MATURIN_ARGS }}
+          manylinux: auto
+          sccache: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.target }}
+          path: ${{ env.CRATE_DIR }}/dist/*.whl
+          if-no-files-found: error
+
+  macos:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-13      # Intel
+            target: x86_64
+          - runner: macos-14      # Apple Silicon
+            target: aarch64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: ${{ env.CRATE_DIR }}
+          target: ${{ matrix.target }}
+          args: ${{ env.MATURIN_ARGS }}
+          sccache: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-${{ matrix.target }}
+          path: ${{ env.CRATE_DIR }}/dist/*.whl
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: ${{ matrix.target }}
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: ${{ env.CRATE_DIR }}
+          target: ${{ matrix.target }}
+          args: ${{ env.MATURIN_ARGS }}
+          sccache: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-${{ matrix.target }}
+          path: ${{ env.CRATE_DIR }}/dist/*.whl
+          if-no-files-found: error
+
+  sdist:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: ${{ env.CRATE_DIR }}
+          command: sdist
+          args: --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-sdist
+          path: ${{ env.CRATE_DIR }}/dist/*.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI (Trusted Publishing)
+    runs-on: ubuntu-latest
+    needs: [linux, macos, windows, sdist]
+    # Publish ONLY on a version tag. A manual (workflow_dispatch) run builds all
+    # platforms as a rehearsal and stops here.
+    if: startsWith(github.ref, 'refs/tags/')
+    # To harden with a GitHub Environment: create one named `pypi`
+    # (repo Settings → Environments), set the SAME name in the PyPI trusted
+    # publisher, and uncomment the next line.
+    # environment: pypi
+    permissions:
+      id-token: write         # REQUIRED for Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: ls -la dist
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+          # ── TestPyPI rehearsal instead of real PyPI ──
+          # Set up a trusted publisher on test.pypi.org too, then uncomment:
+          # repository-url: https://test.pypi.org/legacy/
