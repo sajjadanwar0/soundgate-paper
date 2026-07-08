@@ -1,17 +1,78 @@
-# Rust
-/soundgate/target/
-# Python / uv
-.venv/
+# ============ Rust ============
+target/
+target-loom/
+**/*.rs.bk
+# NOTE: Cargo.lock IS committed (reproducible binary artifact) — do not ignore it.
+
+# ============ Python / uv / maturin ============
 __pycache__/
+*.py[cod]
 *.egg-info/
-# LaTeX
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+build/
+dist/
+*.whl
+# NOTE: uv.lock / pyproject.toml ARE committed (frozen resolution) — do not ignore them.
+
+# ============ Node (probes-js) ============
+node_modules/
+npm-debug.log*
+yarn-error.log*
+# NOTE: package-lock.json IS committed — do not ignore it.
+
+# ============ TLA+ / TLC ============
+states/
+*.st
+MC*.out
+*_TTrace_*.tla
+*.toolbox/
+# NOTE: SoundGate*.tla, *.cfg, and the tlc_*.txt / tlapm.txt receipts ARE committed.
+
+# ============ LaTeX (paper/) ============
 *.aux
 *.log
 *.out
+*.toc
+*.lof
+*.lot
 *.bbl
 *.blg
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-# keep the compiled PDF out of VCS if you prefer:
+*.nav
+*.snm
+*.vrb
+# Keep the compiled paper/*.pdf in the repo (comment the next line to ignore it):
 # paper/*.pdf
+
+# ============ Secrets / env (API keys for --live runs) ============
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.toml
+credentials.json
+
+# ============ Editors / OS ============
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============ Bundling / scratch artifacts ============
+/*.zip
+/*.tar.gz
+_*.log

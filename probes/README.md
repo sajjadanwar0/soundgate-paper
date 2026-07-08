@@ -1,37 +1,29 @@
-# agentprobe — model-free control-plane probes
+# `probes/` — model-free differential probes (C1)
 
-Measures whether agent-framework **stop primitives** (approval gates,
-cancellation, timeouts) provide the barrier semantics their names imply.
-No API keys, no LLMs: nodes/steps are plain Python functions, because the
-questions are about *framework control flow*, not any model.
+**Measures** the control-plane gap directly, with no model in the loop: scripted
+plan shapes are driven through each framework and the framework's *own* behavior
+(does the sibling effect execute during a pause? does a cancelled tool still
+land?) is recorded deterministically.
 
-## Layout (src-layout, uv-managed)
-```
-probes/
-├── pyproject.toml
-├── src/agentprobe/
-│   ├── _harness.py            # event log + pre-registered violation records
-│   ├── langgraph_probes.py    # FW-A: sibling leak, replay, cancel, timeout
-│   └── llamaindex_probes.py   # FW-B: parallel approval leak, timeout
-├── tests/test_harness.py
-└── results/                   # committed evidence (regenerate any time)
-```
+## Frameworks (FW-A … FW-E)
+- `src/agentprobe/langgraph_probes.py` — FW-A (LangGraph)
+- `src/agentprobe/llamaindex_probes.py` — FW-B (LlamaIndex Workflows)
+- `src/agentprobe/msaf_probes.py` — FW-C (Microsoft Agent Framework)
+- `src/agentprobe/openai_agents_probes.py` — FW-D (OpenAI Agents SDK)
+- `src/agentprobe/crewai_probes.py` — FW-E (CrewAI; isolated venv, see pyproject)
+- `src/agentprobe/_harness.py` — shared event log / tally / `ProbeResult`
 
-## Run (uv)
+## Layout
+- `results/MATRIX.md` — the cross-framework violation matrix (Table 2).
+- `results/*.txt` — committed per-framework probe transcripts.
+- `tests/` — regression guards: pinned verdict maps (`test_probe_verdicts.py`).
+- `scripts/check_crewai_verdicts.py` — the same guard for the isolated CrewAI venv.
+
+## Run (offline, no keys)
 ```bash
 uv sync
-uv run agentprobe-langgraph   | tee results/langgraph.txt
-uv run agentprobe-llamaindex  | tee results/llamaindex.txt
-uv run pytest
+uv run pytest                       # verdict regression guards
+uv run python -m agentprobe.langgraph_probes    # a single framework's probes
 ```
-
-## Adding a framework (build phase)
-1. `uv add <framework>` (moves the pin into pyproject + uv.lock).
-2. Add `src/agentprobe/<fw>_probes.py` using the same `_harness` API:
-   build a minimal workflow, represent effects as `LOG.log(...)`, set a
-   violation predicate, return `ProbeResult`.
-3. Register a console script in `pyproject.toml`.
-4. Commit the generated `results/<fw>.txt`.
-
-## Violation predicates (fixed before running = pre-registration)
-See each probe's docstring; a result is one bit — does the primitive hold.
+Managed with **uv**; `uv.lock` is committed for a frozen resolution. CrewAI runs
+in a separate venv because of dependency conflicts (see `pyproject.toml`).
