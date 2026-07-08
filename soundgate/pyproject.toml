@@ -1,0 +1,31 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "soundgate"
+version = "0.1.0"
+description = "External effect-admission gate for LLM-agent frameworks (Rust core, Python bindings)"
+readme = "README_python.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+authors = [{ name = "Sajjad Khan", email = "you@example.com" }]
+keywords = ["llm", "agents", "reference-monitor", "admission-control", "langgraph", "safety"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.urls]
+Homepage = "https://github.com/sajjadanwar0/soundgate-paper"
+Repository = "https://github.com/sajjadanwar0/soundgate-paper"
+Source = "https://github.com/sajjadanwar0/soundgate-paper/tree/main/soundgate"
+Issues = "https://github.com/sajjadanwar0/soundgate-paper/issues"
+
+[tool.maturin]
+module-name = "soundgate"
+features = ["python"]
+bindings = "pyo3"
+strip = true
