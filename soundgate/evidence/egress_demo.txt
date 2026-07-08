@@ -1,0 +1,6 @@
+soundgate listening on 127.0.0.1:8899 (in-memory)
+--- unmediated external call (must FAIL: namespace has no egress)
+    blocked by kernel: [Errno 101] Network is unreachable
+--- mediated call through the gate (must SUCCEED)
+    gate verdict: {"verdict":"release"}
+egress_demo: only path out of the namespace is through the gate.

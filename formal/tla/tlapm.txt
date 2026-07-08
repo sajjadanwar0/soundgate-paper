@@ -1,0 +1,5 @@
+(* loading fingerprints in ".tlacache/SoundGate_Proofs.tlaps/fingerprints" *)
+(* created new ".tlacache/SoundGate_Proofs.tlaps/SoundGate_Proofs.thy" *)
+(* fingerprints written in ".tlacache/SoundGate_Proofs.tlaps/fingerprints" *)
+File "./SoundGate_Proofs.tla", line 1, character 1 to line 155, character 77:
+[INFO]: All 68 obligations proved.

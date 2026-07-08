@@ -1,0 +1,48 @@
+== caching sudo credentials for tc (bench itself runs as neo) ==
+== preflight: one client run at 0ms (no delay) ==
+---- preflight output (exit 0) ----
+    Finished `release` profile [optimized] target(s) in 0.20s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 1 100 preflight`
+preflight,clients=1,ops=100,wall_s=0.030,thpt_adm_per_s=3321,p50_us=271.0,p95_us=455.6,p99_us=848.3,p999_us=848.3,max_us=848.3
+------------------------------------------
+   preflight OK
+== RTT ~= 0ms (one-way 0ms): bench_raft.sh CLIENTS='1 8 32' OPS=20000 ==
+leader = node 0 ; effect port 127.0.0.1:9201
+# soundgate raft 3-node throughput; 2026-07-07T07:04:15Z
+# leader=node0  ops_per_client=20000
+# --- leader raft metrics (quorum evidence) ---
+# {'current_leader': 0, 'vote': {'committed': True, 'leader_id': {'node_id': 0, 'term': 1}}, 'last_log_index': 305, 'last_applied': {'index': 305, 'leader_id': {'node_id': 0, 'term': 1}}, 'membership_config': {'log_id': {'index': 5, 'leader_id': {'node_id': 0, 'term': 1}}, 'membership': {'configs': [[0, 1, 2]], 'nodes': {'0': {'addr': 'http://127.0.0.1:9101'}, '1': {'addr': 'http://127.0.0.1:9102'}, '2': {'addr': 'http://127.0.0.1:9103'}}}}}
+>> C=1
+    Finished `release` profile [optimized] target(s) in 0.20s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 1 20000 raft-3node`
+raft-3node,clients=1,ops=20000,wall_s=8.913,thpt_adm_per_s=2244,p50_us=319.4,p95_us=1235.3,p99_us=2143.4,p999_us=4403.4,max_us=9001.4
+>> C=8
+    Finished `release` profile [optimized] target(s) in 0.10s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 8 20000 raft-3node`
+raft-3node,clients=8,ops=160000,wall_s=69.712,thpt_adm_per_s=2295,p50_us=943.2,p95_us=15888.0,p99_us=24439.7,p999_us=38804.3,max_us=72150.5
+>> C=32
+    Finished `release` profile [optimized] target(s) in 0.11s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 32 20000 raft-3node`
+raft-3node,clients=32,ops=640000,wall_s=380.685,thpt_adm_per_s=1681,p50_us=2179.2,p95_us=91608.0,p99_us=148142.4,p999_us=286761.4,max_us=689112.3
+
+wrote concurrent_raft.txt
+send me concurrent_raft.txt -- I verify it is a real 3-voter quorum
+(current_leader set, membership_config has 3 voters) before it enters Table 6.
+  -> wan_sweep/rtt_0ms.txt  (3 result line(s))
+== RTT ~= 10ms (one-way 5ms): bench_raft.sh CLIENTS='1 8 32' OPS=20000 ==
+leader = node 0 ; effect port 127.0.0.1:9201
+# soundgate raft 3-node throughput; 2026-07-07T07:11:59Z
+# leader=node0  ops_per_client=20000
+# --- leader raft metrics (quorum evidence) ---
+# {'current_leader': 0, 'vote': {'committed': True, 'leader_id': {'node_id': 0, 'term': 1}}, 'last_log_index': 828505, 'last_applied': {'index': 828505, 'leader_id': {'node_id': 0, 'term': 1}}, 'membership_config': {'log_id': {'index': 5, 'leader_id': {'node_id': 0, 'term': 1}}, 'membership': {'configs': [[0, 1, 2]], 'nodes': {'0': {'addr': 'http://127.0.0.1:9101'}, '1': {'addr': 'http://127.0.0.1:9102'}, '2': {'addr': 'http://127.0.0.1:9103'}}}}}
+>> C=1
+    Finished `release` profile [optimized] target(s) in 0.31s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 1 20000 raft-3node`
+raft-3node,clients=1,ops=20000,wall_s=783.972,thpt_adm_per_s=26,p50_us=21535.3,p95_us=115250.0,p99_us=172381.1,p999_us=258553.9,max_us=374432.1
+>> C=8
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 8 20000 raft-3node`
+raft-3node,clients=8,ops=160000,wall_s=1099.217,thpt_adm_per_s=146,p50_us=31706.2,p95_us=159238.2,p99_us=239799.3,p999_us=323610.3,max_us=499605.7
+>> C=32
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running `target/release/concurrent_bench '127.0.0.1:9201' 32 20000 raft-3node`

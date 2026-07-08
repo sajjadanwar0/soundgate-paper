@@ -1,0 +1,37 @@
+E-E2E-JS transcript -- FW-F (LangGraph.js) end-to-end repair via SoundGate
+date: 2026-07-06T08:39:18Z  Ubuntu 24.04
+node: v22.22.2   @langchain/langgraph: 1.4.7   @langchain/core: 1.2.1
+gate: soundgate 0.1.0, default features, built with rustc 1.91.1 (ed61e7d7e 2025-11-07) (built from a source tarball) (release profile)
+protocol: line-delimited JSON over loopback TCP 127.0.0.1:8798 (identical to the Python integrations)
+command: node e2e_langgraph_js.mjs   (five repetitions below)
+======================================================================
+--- repetition 1 ---
+A sibling-leak repaired   : paused=true effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=["release","refused_duplicate"] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C orphan fenced           : abort_seen=true zombie_verdict=["refused_cancelled"] effect_executed=false -> FENCED (repaired)
+
+E-E2E-JS (real @langchain/langgraph==1.4.7, node v22.22.2): 3/3 violations repaired in situ
+--- repetition 2 ---
+A sibling-leak repaired   : paused=true effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=["release","refused_duplicate"] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C orphan fenced           : abort_seen=true zombie_verdict=["refused_cancelled"] effect_executed=false -> FENCED (repaired)
+
+E-E2E-JS (real @langchain/langgraph==1.4.7, node v22.22.2): 3/3 violations repaired in situ
+--- repetition 3 ---
+A sibling-leak repaired   : paused=true effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=["release","refused_duplicate"] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C orphan fenced           : abort_seen=true zombie_verdict=["refused_cancelled"] effect_executed=false -> FENCED (repaired)
+
+E-E2E-JS (real @langchain/langgraph==1.4.7, node v22.22.2): 3/3 violations repaired in situ
+--- repetition 4 ---
+A sibling-leak repaired   : paused=true effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=["release","refused_duplicate"] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C orphan fenced           : abort_seen=true zombie_verdict=["refused_cancelled"] effect_executed=false -> FENCED (repaired)
+
+E-E2E-JS (real @langchain/langgraph==1.4.7, node v22.22.2): 3/3 violations repaired in situ
+--- repetition 5 ---
+A sibling-leak repaired   : paused=true effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=["release","refused_duplicate"] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C orphan fenced           : abort_seen=true zombie_verdict=["refused_cancelled"] effect_executed=false -> FENCED (repaired)
+
+E-E2E-JS (real @langchain/langgraph==1.4.7, node v22.22.2): 3/3 violations repaired in situ

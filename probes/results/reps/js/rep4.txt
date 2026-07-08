@@ -1,0 +1,9 @@
+# FW-F @langchain/langgraph@1.4.7 (Node v22.22.2)
+
+sibling_leak[fan_out]            -> VIOLATION  {"paused":true,"effect_while_paused":true,"trace_at_pause":["gate:before_interrupt","EFFECT:executed"]}
+reject_after_effect              -> VIOLATION  {"effect_total_after_reject":1}
+replay[resume_after_approve]     -> VIOLATION  {"paused":true,"effect_count_at_pause":1,"effect_count_after_approve":2}
+cancellation[abort_signal]       -> VIOLATION  {"abort_seen":true,"caller_saw":"AbortError","effect_at_cancel":false,"effect_after_cancel":true,"note":"no sync/async split exists in JS: promises are not cancellable"}
+timeout_zombie[abort_timeout]    -> VIOLATION  {"caller_saw":"TimeoutError","effect_at_timeout":false,"effect_after_timeout":true}
+
+VIOLATION AXES CONFIRMED: 5/5

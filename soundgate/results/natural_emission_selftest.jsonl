@@ -1,0 +1,3 @@
+{"id": "st-1", "consequential_tool": "get_recent_orders", "n_tools": 3, "runs": 1, "called": 1, "parallel_exposure": 1}
+{"id": "st-2", "consequential_tool": "send_message", "n_tools": 3, "runs": 1, "called": 1, "parallel_exposure": 1}
+{"id": "st-3", "excluded": "no_consequential_tool"}

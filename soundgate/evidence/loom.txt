@@ -1,0 +1,12 @@
+loom concurrent-Rust model checking -- SoundGate Gate core (reviewer D2)
+date: 2026-07-06T10:42:28Z  host: Linux 6.8.0-134-generic
+toolchain: rustc 1.95.0 (59807616e 2026-04-14)   loom = 0.7
+command: RUSTFLAGS="--cfg loom" cargo test --release --features conformance --test loom_gate_test
+each loom::model exhaustively explores the thread interleavings of the mutex-guarded
+real Gate (submit/decide/cancel), asserting the three-part invariant + verdict facts.
+======================================================================
+running 3 tests
+test concurrent_decides_release_at_most_once ... ok
+test submit_decide_cancel_race_preserves_invariants ... ok
+test cross_run_key_reuse_is_independent ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s

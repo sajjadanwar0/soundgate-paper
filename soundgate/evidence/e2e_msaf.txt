@@ -1,0 +1,5 @@
+A sibling-leak repaired   : paused=True sibling=held_for_approval effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+C zombie fenced           : cancelled_seen=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+D timeout zombie fenced   : caller_saw_timeout=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+
+E-E2E-C (real agent-framework-core==1.10.0): 3/3 violation classes repaired in situ (replay is natively clean on FW-C)

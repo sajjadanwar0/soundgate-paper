@@ -1,0 +1,71 @@
+[project]
+name = "agentprobe"
+version = "0.1.0"
+description = "Model-free probes for agent-framework control-plane semantics"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Sajjad Khan" }]
+
+# Pinned so the paper's numbers are reproducible. The study reports two
+# LangGraph releases to demonstrate version stability; change the pin and
+# re-run to reproduce that check.
+dependencies = [
+    "anthropic>=0.116.0",
+    "langgraph==1.2.7",
+    "llama-index-core==0.14.23",
+    "openai>=2.44.0",
+]
+
+[project.optional-dependencies]
+# One extra per probed framework; each pin is the exact version the matrix
+# row was recorded under (results/MATRIX.md).
+msaf = ["agent-framework-core==1.10.0"]
+openai-sdk = ["openai-agents==0.17.7"]
+# crewai 1.15.1 does NOT hard-fail resolution against the base deps, but it
+# forces downgrades of 8 packages in the closure the FW-A..FW-D verdicts were
+# recorded under (pydantic 2.13.4, pydantic-core, pydantic-settings, mcp,
+# opentelemetry-api, jiter, regex, aiosqlite; measured via
+# `uv pip install --dry-run crewai==1.15.1`, 2026-07-02). It therefore gets
+# its own environment. The `conflicts` table below makes
+# `uv sync --all-extras` fail loudly instead of silently mutating the pins.
+crewai = ["crewai==1.15.1"]
+
+[tool.uv]
+conflicts = [
+    [{ extra = "crewai" }, { extra = "msaf" }],
+    [{ extra = "crewai" }, { extra = "openai-sdk" }],
+]
+
+[project.scripts]
+agentprobe-langgraph = "agentprobe.langgraph_probes:main"
+agentprobe-llamaindex = "agentprobe.llamaindex_probes:main"
+agentprobe-msaf = "agentprobe.msaf_probes:main"
+agentprobe-openai = "agentprobe.openai_agents_probes:main"
+agentprobe-crewai = "agentprobe.crewai_probes:main"
+
+[dependency-groups]
+# uv-native dev group (installed by `uv sync`, excluded from published deps).
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentprobe"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true

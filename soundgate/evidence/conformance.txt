@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/conformance.rs (target/release/deps/conformance-fb28c16b72ccec00)
+
+running 1 test
+conformance: 12000000 operations across 200000 traces (domain 8 runs x 6 keys) -- real Gate and Verus model agreed on every verdict and every derived-state snapshot.
+test model_and_code_are_observationally_equivalent ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.28s
+

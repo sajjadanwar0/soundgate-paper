@@ -1,0 +1,4 @@
+mem,clients=1,ops=80000,wall_s=4.737,thpt_adm_per_s=16889,p50_us=50.9,p95_us=84.5,p99_us=163.4,p999_us=237.2,max_us=17250.9
+mem,clients=8,ops=80000,wall_s=0.390,thpt_adm_per_s=204940,p50_us=33.4,p95_us=46.3,p99_us=62.0,p999_us=106.9,max_us=25459.6
+mem,clients=32,ops=80000,wall_s=0.213,thpt_adm_per_s=374929,p50_us=67.5,p95_us=149.5,p99_us=259.1,p999_us=609.7,max_us=2331.1
+mem,clients=128,ops=102400,wall_s=0.315,thpt_adm_per_s=325548,p50_us=329.1,p95_us=579.2,p99_us=1139.9,p999_us=3914.4,max_us=27795.5

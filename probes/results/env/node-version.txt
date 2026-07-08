@@ -1,0 +1,5 @@
+v22.22.2
+probes@1.0.0 /home/claude/work/soundgate-paper/probes-js
++-- @langchain/core@1.2.1
+`-- @langchain/langgraph@1.4.7
+

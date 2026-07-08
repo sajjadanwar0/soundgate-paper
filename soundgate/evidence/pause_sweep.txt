@@ -1,0 +1,19 @@
+========================================================================
+FW-A (LangGraph) approval-pause sweep -- sibling leak vs pause duration
+langgraph 1.2.7   reps/pause: 20   gate: 127.0.0.1:8799
+------------------------------------------------------------------------
+pause(s) | UNMEDIATED                   | MEDIATED (SoundGate)        
+         | leak@pause  after-reject     | leak@pause  after-reject    
+------------------------------------------------------------------------
+0.0      | 20/20 leaked  20/20 effect |  0/20 leaked   0/20 effect
+0.1      | 20/20 leaked  20/20 effect |  0/20 leaked   0/20 effect
+0.5      | 20/20 leaked  20/20 effect |  0/20 leaked   0/20 effect
+1.0      | 20/20 leaked  20/20 effect |  0/20 leaked   0/20 effect
+2.0      | 20/20 leaked  20/20 effect |  0/20 leaked   0/20 effect
+------------------------------------------------------------------------
+Reading: the unmediated leak count is INVARIANT to pause duration -- the
+effect lands in the fan-out superstep before invoke() returns, so no human
+reaction time closes it. Every mediated cell is zero at every pause.
+
+VERDICT: PASS -- leak is pause-invariant unmediated; zero under the gate
+at every pause value; rejection yields zero effects throughout.

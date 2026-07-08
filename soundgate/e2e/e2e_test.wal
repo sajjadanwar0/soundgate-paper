@@ -1,0 +1,3 @@
+{"ev":"released","run_id":"r7","effect_key":"pay_once"}
+{"ev":"cancelled","run_id":"r8"}
+{"ev":"released","run_id":"r9","effect_key":"new_work"}

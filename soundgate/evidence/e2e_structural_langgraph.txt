@@ -1,0 +1,14 @@
+=== [namespace] loopback up; no other interface, no route out ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+=== [namespace] BYPASS PROBE: unwrapped tool path (must FAIL) ===
+    unmediated external connect refused by kernel: [Errno 101] Network is unreachable
+=== [namespace] FULL FRAMEWORK INTEGRATION (must PASS 3/3) ===
+A sibling-leak repaired   : paused=True effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=['release', 'refused_duplicate'] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C zombie fenced           : zombie_verdict=['refused_cancelled'] effect_executed=False -> FENCED (repaired)
+
+E-E2E (real langgraph==1.2.7): 3/3 violations repaired in situ
+=== [namespace] POST-CHECK: egress still absent after the run ===
+    still refused by kernel: [Errno 101] Network is unreachable
+e2e_structural: framework integration passed under OS-enforced mediation;
+e2e_structural: the only path out of the namespace is through the gate.

@@ -1,0 +1,19 @@
+{
+  "name": "agentprobe-js",
+  "version": "0.1.0",
+  "description": "Keyless control-plane probes for LangGraph.js (FW-F column of the matrix)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "probe": "node langgraph_probes.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/core": "^1.2.1",
+    "@langchain/langgraph": "^1.4.7",
+    "openai": "^6.45.0"
+  }
+}

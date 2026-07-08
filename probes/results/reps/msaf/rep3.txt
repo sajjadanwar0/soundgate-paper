@@ -1,0 +1,11 @@
+# FW-C agent-framework-core==1.10.0
+
+sibling_leak[fan_out]            -> VIOLATION  {'paused': True, 'effect_while_paused': True, 'trace_at_pause': ['gate:before_request', 'EFFECT:executed']}
+reject_after_effect              -> VIOLATION  {'effect_total_after_reject': 1}
+replay[in_process_response]      -> clean/contrast  {'effect_count_at_pause': 1, 'effect_count_after_approve': 1}
+replay[checkpoint_restore]       -> clean/contrast  {'effect_count_at_pause': 1, 'effect_count_after_restore_approve': 1, 'checkpoints_persisted': 1}
+cancellation[sync_thread]        -> VIOLATION  {'cancelled_seen': True, 'effect_at_cancel': False, 'effect_after_cancel': True}
+cancellation[pure_async]         -> clean/contrast  {'cancelled_seen': True, 'effect_at_cancel': False, 'effect_after_cancel': False}
+timeout_zombie[host_wait_for]    -> VIOLATION  {'caller_saw_timeout': True, 'effect_at_timeout': False, 'effect_after_timeout': True, 'note': 'no native run timeout parameter exists on Workflow.run in 1.10.0'}
+
+VIOLATION AXES CONFIRMED: 4/7

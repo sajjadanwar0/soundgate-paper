@@ -1,0 +1,115 @@
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 5, "names": ["get_order_details", "get_order_details", "get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 5, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_product_details", "get_product_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["list_all_product_types"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 5, "names": ["get_order_details", "get_order_details", "get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 5, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["return_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["list_all_product_types"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 3, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 3, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 3, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 3, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_email"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["transfer_to_human_agents"], "n_cons": 0, "n_benign": 0, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_email"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["return_delivered_order_items", "return_delivered_order_items"], "n_cons": 2, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 1, "names": ["return_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_email"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["return_delivered_order_items", "transfer_to_human_agents"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 1, "names": ["transfer_to_human_agents"], "n_cons": 0, "n_benign": 0, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_email"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["return_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_email"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["return_delivered_order_items", "return_delivered_order_items"], "n_cons": 2, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 1, "names": ["return_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["modify_pending_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["get_order_details", "get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 3, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 3, "names": ["cancel_pending_order", "cancel_pending_order", "return_delivered_order_items"], "n_cons": 3, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 2, "names": ["cancel_pending_order", "return_delivered_order_items"], "n_cons": 2, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 1, "names": ["return_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["calculate"], "n_cons": 0, "n_benign": 0, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["modify_pending_order_address"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["find_user_id_by_name_zip"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_user_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["get_order_details", "get_order_details"], "n_cons": 0, "n_benign": 2, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_product_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["calculate"], "n_cons": 0, "n_benign": 0, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 2, "names": ["return_delivered_order_items", "exchange_delivered_order_items"], "n_cons": 2, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": true}
+{"n_tools": 1, "names": ["exchange_delivered_order_items"], "n_cons": 1, "n_benign": 0, "is_cons_batch": true, "benign_sibling": false, "any_sibling": false}
+{"n_tools": 1, "names": ["get_order_details"], "n_cons": 0, "n_benign": 1, "is_cons_batch": false, "benign_sibling": false, "any_sibling": false}

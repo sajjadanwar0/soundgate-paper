@@ -1,0 +1,2 @@
+wal,clients=1,ops=20000,wall_s=154.234,thpt_adm_per_s=130,p50_us=6264.4,p95_us=10266.8,p99_us=10606.0,p999_us=15646.2,max_us=27927.5
+wal,clients=32,ops=20000,wall_s=15.439,thpt_adm_per_s=1295,p50_us=19654.8,p95_us=20255.7,p99_us=20742.3,p999_us=28504.5,max_us=28786.7

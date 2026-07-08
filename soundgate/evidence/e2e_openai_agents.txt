@@ -1,0 +1,4 @@
+A sibling-leak repaired   : paused=True sibling=held_for_approval effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+C zombie fenced           : cancelled_seen=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+
+E-E2E-D (real openai-agents==0.17.7, scripted model): 2/2 violation classes repaired in situ (replay and native timeout are natively clean/refused on FW-D)

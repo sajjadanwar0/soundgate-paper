@@ -1,0 +1,23 @@
+==========================================================================
+SOUNDGATE protocol-boundary fuzz  --  seed 20260707, 25000 inputs/class (G: /10)
+server: target/release/soundgate   elapsed: 54.9s   total inputs: 180651
+--------------------------------------------------------------------------
+class    replies  err-reply     closed    timeout  FAIL-OPEN
+A            165        165      24835          0          0
+B              0          0      25000          0          0
+C          25000      25000          0          0          0
+D          25000      25000          0          0          0
+E          25000      25000          0          0          0
+F          25000       6289          0          0          0
+G           5651          0          0          0          0
+H          20030      12510       4970          0          0
+--------------------------------------------------------------------------
+server alive at end: True
+oracle O1 (fail-closed, zero fail-open verdicts): PASS
+oracle O2 (canary state integrity across all batches): PASS
+oracle O3 (availability, ping after every batch): PASS
+oracle G  (semantic: no unknown/dup/fenced decide releases): PASS
+
+VERDICT: PASS -- every malformed input yielded an error reply or a
+dropped/half-open connection, never a release; state canaries intact;
+server survived all classes.

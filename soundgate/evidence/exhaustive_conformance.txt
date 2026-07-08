@@ -1,0 +1,17 @@
+Bounded-exhaustive model<->code equivalence on the deployed Gate
+date: 2026-07-06T16:40:00Z  toolchain: rustc 1.95.0 (59807616e 2026-04-14)
+======================================================================
+running 3 tests
+BFS reachable state space (2x2 domain): 729 states, diameter 6
+test model_reachable_state_space_bfs ... ok
+COMPLETE transition-relation equivalence over the 2x2 domain: 729 reachable states x 20 transitions = 14580 checked, 0 divergences
+test all_reachable_transitions_equivalent ... ok
+exhaustive conformance: K=5, sequences checked=3200000, per-op checks=16000000
+  depth 1: cumulative distinct reachable states = 17 (+17 new)
+  depth 2: cumulative distinct reachable states = 109 (+92 new)
+  depth 3: cumulative distinct reachable states = 341 (+232 new)
+  depth 4: cumulative distinct reachable states = 601 (+260 new)
+  depth 5: cumulative distinct reachable states = 713 (+112 new)
+  => total distinct reachable states over the 2x2 domain = 713
+test model_and_code_equivalent_exhaustively ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.68s

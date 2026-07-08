@@ -1,0 +1,6 @@
+pipelined,conns=1,window=256,ops=40000,wall_s=1237.444,thpt_adm_per_s=32,p50_us=6914325.0,p95_us=11252886.4,p99_us=11987722.5
+pipelined,conns=1,window=256,ops=40000,wall_s=22.011,thpt_adm_per_s=1817,p50_us=134751.0,p95_us=200223.5,p99_us=210561.6
+pipelined,conns=2,window=256,ops=40000,wall_s=25.044,thpt_adm_per_s=1597,p50_us=318835.1,p95_us=383910.7,p99_us=420862.4
+pipelined,conns=4,window=256,ops=40000,wall_s=18.427,thpt_adm_per_s=2171,p50_us=458896.9,p95_us=557624.2,p99_us=588927.7
+pipelined,conns=8,window=256,ops=40000,wall_s=13.353,thpt_adm_per_s=2996,p50_us=680543.4,p95_us=751159.2,p99_us=784292.3
+pipelined,conns=16,window=256,ops=40000,wall_s=8.794,thpt_adm_per_s=4548,p50_us=898136.0,p95_us=984945.3,p99_us=1012149.2

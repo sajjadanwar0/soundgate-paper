@@ -1,0 +1,82 @@
+======================================================================
+== FW-A LangGraph ==
+  [ns] loopback up; no other interface, no route out:
+      lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  [ns] BYPASS PROBE (external connect must fail):
+    unmediated external connect refused: bash: connect: Network is unreachable
+bash: line 1: /dev/tcp/1.1.1.1/443: Network is unreachable
+  [ns] FULL INTEGRATION (must pass its own N/N):
+A sibling-leak repaired   : paused=True effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+B replay repaired         : node_body_ran=2x verdicts=['release', 'refused_duplicate'] effect_executed=1x -> EXACTLY-ONCE (repaired)
+C zombie fenced           : zombie_verdict=['refused_cancelled'] effect_executed=False -> FENCED (repaired)
+
+E-E2E (real langgraph==1.2.7): 3/3 violations repaired in situ
+  [ns] result: bypass_refused=yes harness_rc=0
+  >> FW-A LangGraph: STRUCTURAL PASS (egress refused + repair passed)
+======================================================================
+== FW-B LlamaIndex ==
+  [ns] loopback up; no other interface, no route out:
+      lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  [ns] BYPASS PROBE (external connect must fail):
+    unmediated external connect refused: bash: connect: Network is unreachable
+bash: line 1: /dev/tcp/1.1.1.1/443: Network is unreachable
+  [ns] FULL INTEGRATION (must pass its own N/N):
+A sibling-leak repaired   : paused=True sibling=held_for_approval effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+C zombie fenced           : cancel=native+gate zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+
+E-E2E-B (real llama-index-core==0.14.23): 2/2 violation classes repaired in situ (replay is natively clean on FW-B)
+  [ns] result: bypass_refused=yes harness_rc=0
+  >> FW-B LlamaIndex: STRUCTURAL PASS (egress refused + repair passed)
+======================================================================
+== FW-C MSAF ==
+  [ns] loopback up; no other interface, no route out:
+      lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  [ns] BYPASS PROBE (external connect must fail):
+    unmediated external connect refused: bash: connect: Network is unreachable
+bash: line 1: /dev/tcp/1.1.1.1/443: Network is unreachable
+  [ns] FULL INTEGRATION (must pass its own N/N):
+A sibling-leak repaired   : paused=True sibling=held_for_approval effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+C zombie fenced           : cancelled_seen=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+D timeout zombie fenced   : caller_saw_timeout=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+
+E-E2E-C (real agent-framework-core==1.10.0): 3/3 violation classes repaired in situ (replay is natively clean on FW-C)
+  [ns] result: bypass_refused=yes harness_rc=0
+  >> FW-C MSAF: STRUCTURAL PASS (egress refused + repair passed)
+======================================================================
+== FW-D OpenAI Agents ==
+  [ns] loopback up; no other interface, no route out:
+      lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  [ns] BYPASS PROBE (external connect must fail):
+    unmediated external connect refused: bash: connect: Network is unreachable
+bash: line 1: /dev/tcp/1.1.1.1/443: Network is unreachable
+  [ns] FULL INTEGRATION (must pass its own N/N):
+A sibling-leak repaired   : paused=True sibling=held_for_approval effects_during_pause=0 reject=refused_rejected effects_total=0 -> HELD+REFUSED (repaired)
+C zombie fenced           : cancelled_seen=True zombie_effect_executed=False effects_total=0 -> FENCED (repaired)
+
+E-E2E-D (real openai-agents==0.17.7, scripted model): 2/2 violation classes repaired in situ (replay and native timeout are natively clean/refused on FW-D)
+  [ns] result: bypass_refused=yes harness_rc=0
+  >> FW-D OpenAI Agents: STRUCTURAL PASS (egress refused + repair passed)
+======================================================================
+== FW-E CrewAI ==
+  [ns] loopback up; no other interface, no route out:
+      lo               UNKNOWN        127.0.0.1/8 ::1/128 
+  [ns] BYPASS PROBE (external connect must fail):
+    unmediated external connect refused: bash: connect: Network is unreachable
+bash: line 1: /dev/tcp/1.1.1.1/443: Network is unreachable
+  [ns] FULL INTEGRATION (must pass its own N/N):
+D cancel-orphan fenced    : cancelled_seen=True gate_verdict=refused_cancelled effect_after_cancel=False -> FENCED (repaired)
+E timeout-zombie fenced   : caller_blocked=4.8s (deadline=1.0s) gate_verdict=refused_cancelled effect_landed=False -> FENCED (repaired)
+
+E-E2E FW-E (real crewai==1.15.1): 2/2 violated axes fenced in situ
+  [ns] result: bypass_refused=yes harness_rc=0
+  >> FW-E CrewAI: STRUCTURAL PASS (egress refused + repair passed)
+======================================================================
+STRUCTURAL-MEDIATION SUMMARY (0=structural pass, 2=skipped, other=fail):
+  FW-A: 0
+  FW-B: 0
+  FW-C: 0
+  FW-D: 0
+  FW-E: 0
+A structural pass means: inside the namespace an unwrapped tool's egress is
+kernel-refused AND the framework repair still passes -- complete mediation
+enforced by the OS, not by wrapper discipline.

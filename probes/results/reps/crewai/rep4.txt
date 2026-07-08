@@ -1,0 +1,19 @@
+# FW-E crewai==1.15.1
+
+╭───────────────────────── 💬 Human Feedback Required ─────────────────────────╮
+│                                                                              │
+│  Provide feedback on the Final Result above.                                 │
+│                                                                              │
+│  • If you are happy with the result, simply hit Enter without typing         │
+│  anything.                                                                   │
+│  • Otherwise, provide specific improvement requests.                         │
+│  • You can provide multiple rounds of feedback until satisfied.              │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+review_after_effect[human_input] -> VIOLATION  {'effect_executed': True, 'feedback_requested': True, 'effect_before_review': True, 'note': 'human_input is post-hoc feedback by design; no pre-execution approval primitive exists in OSS CrewAI'}
+cancellation[kickoff_async]      -> VIOLATION  {'cancelled_seen': True, 'caller_saw_other': None, 'effect_at_cancel': False, 'effect_after_cancel': True}
+timeout_zombie_strict[max_execution_time] -> clean/contrast  {'caller_saw_timeout': True, 'caller_exception': 'TimeoutError', 'effect_at_timeout': True, 'effect_after_timeout': True}
+timeout_blocks_then_effect[max_execution_time] -> VIOLATION  {'caller_saw_timeout': True, 'caller_exception': 'TimeoutError', 'timeout_surfaced_at_s': 2.24, 'declared_deadline_s': 1.0, 'effect_executed_despite_timeout': True}
+replay[checkpoint_resume]        -> clean/contrast  {'outcome': 'NOT PROBED in this pass', 'note': 'Crew.from_checkpoint exists in 1.15; mid-task replay semantics unverified (VERIFY before any claim)'}
+
+VIOLATION AXES CONFIRMED: 3/5

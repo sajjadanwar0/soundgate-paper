@@ -1,0 +1,10 @@
+server: decision authenticity ENABLED
+
+  held effect                     : held_for_approval
+  forged approve (no mac)         : error unauthenticated decision: bad or m
+  forged approve (bad mac)        : error unauthenticated decision: bad or m
+  forged reject  (bad mac)        : error unauthenticated decision: bad or m
+  still held after 3 forgeries    : held_for_approval
+  legitimate approve (valid mac)  : release
+
+E-AUTH: forged decisions refused; effect held through every forgery; only the secret-holder released it -> decision channel authenticated

@@ -1,0 +1,6 @@
+gate_down_refuses            -> OK
+gate_up_releases             -> OK
+sigkill_midsession_refuses   -> OK
+restart_fresh_and_fenced     -> OK
+
+E-E2E-PARTITION: 4/4 fail-closed checks passed (down / SIGKILL mid-session / WAL restart)

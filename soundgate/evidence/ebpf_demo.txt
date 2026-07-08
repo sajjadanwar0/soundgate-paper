@@ -1,0 +1,25 @@
+== environment ==
+6.8.0-134-generic
+BTF: present
+== compile (skip if .o already built) ==
+compiled ebpf/mediation_guard.o
+== load + pin the program ==
+loaded; program info:
+95: cgroup_sock_addr  name restrict_egress  tag 7730cd4ac46f1d30  gpl
+	loaded_at 2026-07-05T10:56:31+0500  uid 0
+	xlated 80B  jited 66B  memlock 4096B
+	btf_id 196
+== create cgroup and attach ==
+attached program under /sys/fs/cgroup/soundgate_mediation:
+CgroupPath
+ID       AttachType      AttachFlags     Name           
+/sys/fs/cgroup/soundgate_mediation
+95       cgroup_inet4_connect                 restrict_egress                
+== start the gate on the allow-listed address ==
+soundgate listening on 127.0.0.1:8796 (in-memory)
+== move THIS shell into the attached cgroup, then test from within it ==
+--- unmediated external connect (must FAIL: kernel denies at connect4)
+    refused by kernel: [Errno 1] Operation not permitted
+--- mediated connect to the gate (must SUCCEED)
+    gate verdict: {"verdict":"release"}
+ebpf_demo: connect() to any non-gate address is refused by the kernel; the tool cannot opt out.

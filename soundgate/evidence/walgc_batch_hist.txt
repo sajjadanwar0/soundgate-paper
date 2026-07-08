@@ -1,0 +1,8 @@
+# WAL group-commit batch-size distribution, single-vCPU container, 2026-07-04
+# concurrent_bench <addr> C 800 (incl. ~200/client warmup); SOUNDGATE_WAL_STATS_EVERY=100
+--- C=8 ---
+soundgate: wal group-commit batches=1500 events=7974 mean=5.3 hist[1|2-8|9-64|65-256|257-512]=[61, 1439, 0, 0, 0]
+--- C=32 ---
+soundgate: wal group-commit batches=1200 events=31961 mean=26.6 hist[1|2-8|9-64|65-256|257-512]=[12, 79, 1109, 0, 0]
+--- C=128 ---
+soundgate: wal group-commit batches=1100 events=127993 mean=116.4 hist[1|2-8|9-64|65-256|257-512]=[3, 9, 35, 1053, 0]

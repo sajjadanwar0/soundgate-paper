@@ -1,0 +1,4 @@
+walgc,clients=1,ops=20000,wall_s=160.796,thpt_adm_per_s=124,p50_us=9701.9,p95_us=10282.3,p99_us=10630.3,p999_us=15538.4,max_us=27739.1
+walgc,clients=8,ops=20000,wall_s=27.961,thpt_adm_per_s=715,p50_us=10537.1,p95_us=11145.3,p99_us=12013.6,p999_us=18001.0,max_us=20894.6
+walgc,clients=32,ops=20000,wall_s=8.343,thpt_adm_per_s=2397,p50_us=10825.0,p95_us=11622.6,p99_us=14060.8,p999_us=22630.4,max_us=27420.3
+walgc,clients=128,ops=76800,wall_s=6.409,thpt_adm_per_s=11984,p50_us=6944.8,p95_us=13151.6,p99_us=17176.9,p999_us=35051.0,max_us=54251.9

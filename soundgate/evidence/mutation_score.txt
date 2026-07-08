@@ -1,0 +1,18 @@
+baseline (unmutated) exhaustive conformance ... PASS
+
+PHASE 1 -- exhaustive (single-threaded) harness:
+  verdict_flip               [P1/P2 hold-until-decided / reject-cancels] -> CAUGHT
+  dedup_negate               [P3 dedup-on-replay] -> CAUGHT
+  submit_fence_or_to_and     [P4 fence-on-cancel (submit path)] -> CAUGHT
+  hold_negate                [P1 hold-until-decided (approval gating)] -> CAUGHT
+  decide_fence_or_to_and     [P4 fence-on-cancel (decide-after-hold race)] -> survived  (concurrency-only; expected to survive here)
+
+PHASE 2 -- loom (concurrent) harness on survivors:
+  decide_fence_or_to_and     [P4 fence-on-cancel (decide-after-hold race)] -> CAUGHT by loom
+----------------------------------------------------------------------
+Exhaustive harness: 4/4 single-threaded-reachable property mutations caught.
+Loom harness:       1/1 concurrency-only mutation(s) caught.
+COMBINED:           5/5 property-violating mutations caught across the two harnesses.
+Each mutation is a named, safety-critical one-edit break of an enforced
+property; the harness that catches it is the one whose reachability includes
+that state. No property mutation passes unnoticed by the suite as a whole.

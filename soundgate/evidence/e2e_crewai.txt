@@ -1,0 +1,4 @@
+D cancel-orphan fenced    : cancelled_seen=True gate_verdict=refused_cancelled effect_after_cancel=False -> FENCED (repaired)
+E timeout-zombie fenced   : caller_blocked=4.8s (deadline=1.0s) gate_verdict=refused_cancelled effect_landed=False -> FENCED (repaired)
+
+E-E2E FW-E (real crewai==1.15.1): 2/2 violated axes fenced in situ

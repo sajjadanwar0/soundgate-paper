@@ -1,0 +1,11 @@
+# soundgate raft failover receipt; 2026-07-06T05:10:28Z
+# initial leader: node 0 (effect 9201)
+# pre-crash submit  -> {"verdict":"release"}        (expect release)
+# killing leader node 0 (pid 10723) ...
+# new leader elected: node 2  (effect 9203)  in 1.92s
+# post-failover re-submit (same id) -> {"verdict":"refused_duplicate"}   (expect refused_duplicate)
+# post-failover fresh submit        -> {"verdict":"release"}   (expect release)
+
+# RESULT: PASS -- new leader in 1.92s; pre-crash fence survived
+#         (no double-release across failover); cluster still admitting.
+# send me raft_failover.txt

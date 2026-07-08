@@ -1,0 +1,10 @@
+held                 -> OK
+watchdog_rejected    -> OK
+sticky_resubmit      -> OK
+late_approve_dead    -> OK
+no_mac_refused       -> OK
+control_released     -> OK
+starved_never_ran    -> OK
+late_watchdog_noop   -> OK
+
+E-E2E-TTL: 8/8 bounded-hold checks passed (TTL=0.5s, HMAC-authenticated watchdog)

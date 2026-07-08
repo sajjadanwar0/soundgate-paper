@@ -1,0 +1,8 @@
+# FW-B llama-index-core==0.14.23
+
+parallel_approval_leak           -> VIOLATION  {'effect_before_human_response': True, 'effect_total': 1, 'trace': ['gate:before_input', 'L_EFFECT:executed', 'gate:before_input', 'gate:resumed=no']}
+timeout_zombie                   -> clean/contrast  {'caller_saw_timeout': True, 'effect_at_timeout': False, 'effect_after_timeout': False}
+cancellation[cancel_run:worker_thread] -> VIOLATION  {'cancel_returned': True, 'effect_at_cancel': False, 'effect_after_cancel': True, 'note': 'native cancel_run raises WorkflowCancelledByUser in-workflow; worker thread is not covered by cooperative cancellation'}
+replay[context_restore]          -> clean/contrast  {'effect_count_run1': 1, 'effect_count_after_resume': 1, 'note': 'resume via run(ctx=Context.from_dict(to_dict())); violation = effect re-executed on restore'}
+
+VIOLATION AXES CONFIRMED: 2/4

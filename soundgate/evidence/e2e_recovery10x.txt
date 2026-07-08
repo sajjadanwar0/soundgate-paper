@@ -1,0 +1,7 @@
+synthesized WAL: 1,706,000 events, 107.0 MB (generated in 3.3s)
+recovery (spawn -> first pong, fail-closed window): 1.7 s  (~997k events/s)
+replayed_identity_refused_duplicate    -> OK
+cancelled_run_fence_survives           -> OK
+fresh_work_releases                    -> OK
+
+E-E2E-RECOVERY10X: 1,706,000 events / 107.0 MB replayed in 1.7 s; state checks 3/3

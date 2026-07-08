@@ -1,0 +1,10 @@
+# FW-A langgraph==1.2.7
+
+sibling_leak[gate_first]         -> VIOLATION  {'paused': True, 'effect_while_paused': True, 'effect_total_after_reject': 1, 'trace_at_pause': ['gate:before_interrupt', 'EFFECT:executed']}
+sibling_leak[effect_first]       -> VIOLATION  {'paused': True, 'effect_while_paused': True, 'effect_total_after_reject': 1, 'trace_at_pause': ['gate:before_interrupt', 'EFFECT:executed']}
+replay_double_execution          -> VIOLATION  {'effect_count_at_pause': 1, 'effect_count_after_approve': 2}
+cancellation[sync_thread]        -> VIOLATION  {'cancelled_seen': True, 'effect_at_cancel': False, 'effect_after_cancel': True}
+cancellation[pure_async]         -> clean/contrast  {'cancelled_seen': True, 'effect_at_cancel': False, 'effect_after_cancel': False}
+timeout_zombie                   -> VIOLATION  {'caller_saw_timeout': True, 'effect_at_timeout': False, 'effect_after_timeout': True}
+
+VIOLATION AXES CONFIRMED: 5/6

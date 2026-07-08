@@ -1,0 +1,24 @@
+[project]
+name = "corpus"
+version = "0.1.0"
+description = "Incident corpus: public bug reports evidencing agent-framework stop-primitive failures (prevalence evidence for the paper). Zero runtime deps; stdlib only."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Sajjad Khan" }]
+dependencies = []
+
+[project.scripts]
+corpus-render = "corpus.render:main"
+corpus-enrich = "corpus.enrich:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/corpus"]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true

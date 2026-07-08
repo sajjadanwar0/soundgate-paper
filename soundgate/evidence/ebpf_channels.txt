@@ -1,0 +1,15 @@
+eBPF egress mediation -- SoundGate (reviewer W2, channel closure)
+date: 2026-07-06T12:26:45Z  host: Linux 6.8.0-134-generic
+kernel egress hooks attached:
+ID       AttachType      AttachFlags     Name           
+233      cgroup_inet4_connect                 restrict_connect4                
+234      cgroup_inet6_connect                 restrict_connect6                
+235      cgroup_udp4_sendmsg                 restrict_sendmsg4                
+236      cgroup_udp6_sendmsg                 restrict_sendmsg6                
+gate listening on 127.0.0.1:8796 (outside the cgroup)
+probes run from a shell placed IN the cgroup; expect: 3 refused, gate allowed
+======================================================================
+v4 TCP connect to non-gate (1.1.1.1:80)    -> PermissionError: [Errno 1] Operation not permitted
+v4 UDP sendto non-gate (1.1.1.1:53)        -> PermissionError: [Errno 1] Operation not permitted
+v6 TCP connect (2606:4700:4700::1111:80)   -> PermissionError: [Errno 1] Operation not permitted
+v4 TCP connect to the GATE (127.0.0.1:8796) -> connected+closed OK

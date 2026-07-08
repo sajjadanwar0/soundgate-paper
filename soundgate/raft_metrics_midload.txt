@@ -1,0 +1,90 @@
+{
+    "current_leader": 0,
+    "current_term": 1,
+    "id": 0,
+    "last_applied": {
+        "index": 200005,
+        "leader_id": {
+            "node_id": 0,
+            "term": 1
+        }
+    },
+    "last_log_index": 200005,
+    "membership_config": {
+        "log_id": {
+            "index": 5,
+            "leader_id": {
+                "node_id": 0,
+                "term": 1
+            }
+        },
+        "membership": {
+            "configs": [
+                [
+                    0,
+                    1,
+                    2
+                ]
+            ],
+            "nodes": {
+                "0": {
+                    "addr": "http://127.0.0.1:9101"
+                },
+                "1": {
+                    "addr": "http://127.0.0.1:9102"
+                },
+                "2": {
+                    "addr": "http://127.0.0.1:9103"
+                }
+            }
+        }
+    },
+    "purged": {
+        "index": 199805,
+        "leader_id": {
+            "node_id": 0,
+            "term": 1
+        }
+    },
+    "replication": {
+        "0": {
+            "index": 200005,
+            "leader_id": {
+                "node_id": 0,
+                "term": 1
+            }
+        },
+        "1": {
+            "index": 200005,
+            "leader_id": {
+                "node_id": 0,
+                "term": 1
+            }
+        },
+        "2": {
+            "index": 200005,
+            "leader_id": {
+                "node_id": 0,
+                "term": 1
+            }
+        }
+    },
+    "running_state": {
+        "Ok": null
+    },
+    "snapshot": {
+        "index": 200005,
+        "leader_id": {
+            "node_id": 0,
+            "term": 1
+        }
+    },
+    "state": "Leader",
+    "vote": {
+        "committed": true,
+        "leader_id": {
+            "node_id": 0,
+            "term": 1
+        }
+    }
+}
