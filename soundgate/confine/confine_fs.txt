@@ -1,0 +1,14 @@
+date: 2026-07-10T04:58:14Z  kernel: 6.8.0-134-generic  libseccomp: 2.5.5  src: confine.c
+>>> ARM A -- UNCONFINED (residual):
+  filesystem  write /tmp/sg_exfil.txt : ESCAPED (leak) ()
+  ipc         socket(AF_UNIX)         : ESCAPED (leak) ()
+  shared-mem  memfd_create            : ESCAPED (leak) ()
+RESULT: 3 of 3 non-network channels ESCAPED
+>>> ARM B -- CONFINED (seccomp; gate egress provisioned):
+  filesystem  write /tmp/sg_exfil.txt : refused (Operation not permitted)
+  ipc         socket(AF_UNIX)         : refused (Operation not permitted)
+  shared-mem  memfd_create            : refused (Operation not permitted)
+  gate        write(inherited fd 4)   : admitted (mediated path works) ()
+RESULT: 0 of 3 non-network channels ESCAPED
+unconfined leaks: 3/3   confined leaks: 0/3
+VERDICT: PASS (fail-open -> fail-closed)

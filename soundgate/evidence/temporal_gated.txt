@@ -1,0 +1,8 @@
+== T5: SOUNDGATE on Temporal (repaired T1 twin) ==
+pinned: temporalio 1.30.0; gate mode: in-process Gate (pip install soundgate)
+
+sibling HELD during signal pause (P1)            -> PASS  pending=1 effects=0
+rejection recorded; zombie resubmit refused (P2) -> PASS  decide=refused_rejected resubmit=refused_rejected sibling_verdict=held_for_approval effects=0
+legitimate mediated effect releases and executes -> PASS  verdict=release effects=1
+
+T5 VERDICT: REPAIRED (0 effects under pause+reject; control released)

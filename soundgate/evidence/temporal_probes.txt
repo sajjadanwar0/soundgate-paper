@@ -1,0 +1,33 @@
+$VENV probe_temporal.py 2>&1 | tee ../soundgate/evidence/temporal_probes.txt
+2026-07-09T16:40:29.669469Z  WARN temporalio_sdk_core::worker::activities: Activity not found on completion. This may happen if the activity has already been cancelled but completed anyway. task_token=TaskToken(CiQwMTlmNDc5ZC0yNmRjLTc5YmEtYjRlNS1iMGI5OWIxYjIwYTESGXdmLXQzLTE3ODM2MTUyMjc2MzMyMTkzMjYaJDAxOWY0N2MwLTg2ZjQtNzJlMC04OTZhLTI2ZGU0MjU4ZmM0ZSAFKAEyATFCD2Jsb2NraW5nX2VmZmVjdEoICAEQs4hAGAE=) details=Status { code: NotFound, message: "workflow execution already completed", details: b"\x08\x05\x12$workflow execution already completed\x1aB\n@type.googleapis.com/temporal.api.errordetails.v1.NotFoundFailure", metadata: MetadataMap { headers: {"content-type": "application/grpc"} }, source: None }
+Completing activity as failed ({'activity_id': '1', 'activity_type': 'heartbeating_effect', 'attempt': 1, 'namespace': 'default', 'task_queue': 'tq-t3b', 'workflow_id': 'wf-t3b-1783615230248711884', 'workflow_run_id': '019f47c0-912b-7824-ace7-502108a794c7', 'workflow_type': 'CancelWorkflow'})
+Traceback (most recent call last):
+  File "soundgate-paper/probes/.venv/lib/python3.12/site-packages/temporalio/worker/_activity.py", line 359, in _handle_start_activity_task
+    result = await self._execute_activity(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "soundgate-paper/probes/.venv/lib/python3.12/site-packages/temporalio/worker/_activity.py", line 714, in _execute_activity
+    return await impl.execute_activity(input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "soundgate-paper/probes/.venv/lib/python3.12/site-packages/temporalio/worker/_activity.py", line 909, in execute_activity
+    return await input.fn(*input.args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "soundgate-paper/probes-temporal/probe_temporal.py", line 153, in heartbeating_effect
+    await asyncio.sleep(0.1)
+  File "/home/user/.local/share/uv/python/cpython-3.12.10-linux-x86_64-gnu/lib/python3.12/asyncio/tasks.py", line 665, in sleep
+    return await future
+           ^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+2026-07-09T16:40:34.899778Z  WARN temporalio_sdk_core::worker::activities: Activity not found on completion. This may happen if the activity has already been cancelled but completed anyway. task_token=TaskToken(CiQwMTlmNDc5ZC0yNmRjLTc5YmEtYjRlNS1iMGI5OWIxYjIwYTESGXdmLXQ0LTE3ODM2MTUyMzI4NjQ0OTM0NjUaJDAxOWY0N2MwLTliNjMtNzkzNi1hYTgzLWYwYzQ2ODczYmZkZiAFKAEyATFCD2Jsb2NraW5nX2VmZmVjdEoICAEQ84hAGAE=) details=Status { code: NotFound, message: "workflow execution already completed", details: b"\x08\x05\x12$workflow execution already completed\x1aB\n@type.googleapis.com/temporal.api.errordetails.v1.NotFoundFailure", metadata: MetadataMap { headers: {"content-type": "application/grpc"} }, source: None }
+== T-PROBES: Temporal contrast arm ==
+pinned: temporalio (Python SDK) 1.30.0; temporal version 1.7.2 (Server 1.31.1, UI 2.49.1)
+python 3.12.10; predicates: Section 3.2, evaluated at the commit point (activity effect-log append); RetryPolicy(maximum_attempts=1) on every activity
+
+T1 sibling approval leak           -> VIOLATION  {'sibling_effects': 1, 'state_when_effect_seen': 'awaiting_decision', 't_effect<t_reject': True}
+T1 reject-after-effect             -> VIOLATION  {'gated_effect_ran': False, 'sibling_already_committed': True}
+T2 replay double-execution         -> clean/contrast  {'pre_gate_effects_before_resume': 1, 'after_resume': 1, 'workflow_reports_replayed': False}
+T3 cancel orphan: no heartbeat     -> VIOLATION  {'caller_observed': 'CancelledError', 'effect_committed': 1, 'effect_after_cancel_observed': True}
+T3b cancel: heartbeating (contrast) -> clean/contrast  {'caller_observed': 'CancelledError', 'effect_committed': 0, 'effect_after_cancel_observed': False}
+T4 timeout zombie                  -> VIOLATION  {'caller_saw': 'timeout_observed', 'effect_committed': 1, 'effect_after_timeout_observed': True}
+
+BEHAVIORAL VIOLATION BITS: 4/6 (contrast arm; excluded from all recurrence denominators)
+NOTE: the T1 bit is behavioral only -- Temporal's documentation does not imply a cross-branch pause, so no contract-mismatch claim attaches to it; T3's cooperative-cancellation and T4's may-still-be-running behaviors are vendor-documented.
