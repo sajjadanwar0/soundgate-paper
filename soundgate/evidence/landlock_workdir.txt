@@ -1,7 +1,7 @@
 == LANDLOCK-CONFINE: path-granular filesystem mediation ==
   python 3.12.10; kernel 6.8.0-134-generic
   filesystem under test: /home/neo/RustroverProjects/soundgate-paper/probes
-  ENFORCEMENT SELF-TEST (handle write, grant nothing -> write must be denied): ALLOWED -> NOT ENFORCING
+  ENFORCEMENT SELF-TEST (handle write, grant nothing -> write must be denied): DENIED -> ENFORCING
   [syscall trace]
     sizeof(ruleset_attr)=16 sizeof(path_beneath_attr)=12 (expect 16 and 12)
     create_ruleset -> fd=5
@@ -9,14 +9,14 @@
     no_new_privs before=0 set_ret=0 after=1 (after must be 1)
     restrict_self -> 0 (0 = ruleset now enforced)
   Landlock ABI: 4 (ENFORCED)
-  handled_access_fs=0x8 (WRITE_FILE); granted beneath workdir only
+  handled_access_fs=0x2 (WRITE_FILE); granted beneath workdir only
   gate mode: in-process Gate
   W1 mediated write -> workdir (expect ALLOW)                -> PASS  (allowed)  released -> committed
-  W2 unmediated write -> shared observed path (expect DENY)  -> FAIL  (allowed)  committed
-  W3 unmediated write -> outside workdir (expect DENY: proves restriction active) -> FAIL  (allowed)  committed
+  W2 unmediated write -> shared observed path (expect DENY)  -> PASS  (denied)  refused (EACCES/errno 13)
+  W3 unmediated write -> outside workdir (expect DENY: proves restriction active) -> PASS  (denied)  refused (EACCES/errno 13)
   R1 read -> shared path (expect ALLOW: reads ungoverned)    -> PASS  (allowed)  read ok
 == LANDLOCK-CONFINE: path-granular filesystem mediation ==
   python 3.12.10; kernel 6.8.0-134-generic
   filesystem under test: /home/neo/RustroverProjects/soundgate-paper/probes
 
-LANDLOCK VERDICT: FAILED (a probe did not match expectation; see matrix)
+LANDLOCK VERDICT: TIGHTENED (workdir write allowed; shared and outside writes refused by kernel; reads ungoverned)

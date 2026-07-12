@@ -1,0 +1,11 @@
+R2 multi-effect prevalence (tau-bench test splits, commit 59a200c; classification rule verified at 59a200c)
+
+retail: 45/115 gold tasks contain >=2 consequential writes
+retail: 41/115 contain an adjacent (consecutive) consequential-write pair
+  write-count distribution: {0: 9, 1: 61, 2: 24, 3: 15, 4: 6}
+  write tools (7): cancel_pending_order, exchange_delivered_order_items, modify_pending_order_address, modify_pending_order_items, modify_pending_order_payment, modify_user_address, return_delivered_order_items
+
+airline: 15/50 gold tasks contain >=2 consequential writes
+airline: 14/50 contain an adjacent (consecutive) consequential-write pair
+  write-count distribution: {0: 20, 1: 15, 2: 8, 3: 4, 4: 2, 5: 1}
+  write tools (6): book_reservation, cancel_reservation, send_certificate, update_reservation_baggages, update_reservation_flights, update_reservation_passengers

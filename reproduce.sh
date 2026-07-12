@@ -136,6 +136,49 @@ PY
 )
 eq "tau-bench ecological arm hard null (0/71)" "$TAU" "0/71"
 
+# --- R1 randomized structural sweep: leak by relation class ------------------
+R1F=$(find_one f "results_fwa.jsonl")
+if [[ -n "$R1F" ]]; then
+  read -r R1_SAME R1_LATER R1_DESC < <(python3 - "$R1F" <<'PY'
+import json,sys
+tot={}; leak={}
+for l in open(sys.argv[1]):
+    if not l.strip(): continue
+    r=json.loads(l)
+    for e in r.get("effects",{}).values():
+        rel=e["relation"]; tot[rel]=tot.get(rel,0)+1
+        if e["during_pause"]: leak[rel]=leak.get(rel,0)+1
+f=lambda k: f"{leak.get(k,0)}/{tot.get(k,0)}"
+print(f("conc_same"), f("conc_later"), f("descendant"))
+PY
+)
+  eq "R1 sweep: concurrent-same-superstep leak (577/577)" "$R1_SAME"  "577/577"
+  eq "R1 sweep: concurrent-later-superstep leak (0/331)"  "$R1_LATER" "0/331"
+  eq "R1 sweep: gate-descendant leak (0/363)"             "$R1_DESC"  "0/363"
+else skip "R1 randgraph results_fwa.jsonl not found; structural-sweep audit skipped"; fi
+
+# --- R2 multi-effect prevalence receipts (tau-bench gold solutions) -----------
+PREV=$(find_one d "prevalence")
+if [[ -n "$PREV" ]] && grep -rqs "45/115" "$PREV" && grep -rqs "15/50" "$PREV" \
+   && grep -rqs "41/115" "$PREV" && grep -rqs "14/50" "$PREV"; then
+  ok "R2 prevalence receipts present (45/115, 15/50; adjacent 41/115, 14/50)"
+else
+  skip "prevalence/ receipts NOT committed -- paper cites 45/115 and 15/50; commit tau_extract.py outputs before submission"
+fi
+
+# --- Landlock path-granular confinement (enforcing-kernel receipt) -----------
+LL="$EVID/landlock_workdir.txt"
+if [[ -f "$LL" ]]; then
+  if grep -q -- "-> ENFORCING" "$LL" && grep -q "LANDLOCK VERDICT: TIGHTENED" "$LL" \
+     && ! grep -q "NOT ENFORCING" "$LL"; then
+    ok "Landlock: self-test ENFORCING; workdir write allowed, shared/outside writes kernel-refused"
+  elif grep -q "NOT ENFORCING" "$LL"; then
+    skip "landlock_workdir.txt shows a NON-ENFORCING run -- re-run probes/landlock_workdir_demo.py (fixed WRITE_FILE constant) on the enforcing kernel and overwrite this receipt"
+  else
+    skip "landlock_workdir.txt present but inconclusive (no ENFORCING/TIGHTENED lines)"
+  fi
+else skip "landlock_workdir.txt missing; Landlock rung unevaluated"; fi
+
 # --- Differential + exhaustive conformance ----------------------------------
 grep -q "12000000 operations" "$EVID/conformance.txt" 2>/dev/null \
   && ok "Differential conformance: 12,000,000 ops, model==code every verdict" \

@@ -1,0 +1,50 @@
+{"index": 0, "user_id": "mia_li_3668", "n_gold_actions": 1, "write_actions": ["book_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 1, "user_id": "olivia_gonzalez_2305", "n_gold_actions": 1, "write_actions": ["cancel_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 2, "user_id": "omar_davis_3817", "n_gold_actions": 5, "write_actions": ["update_reservation_flights", "update_reservation_flights", "update_reservation_flights", "update_reservation_flights", "update_reservation_flights"], "n_writes": 5, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 3, "user_id": "sofia_kim_7287", "n_gold_actions": 2, "write_actions": ["update_reservation_flights", "update_reservation_baggages"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 4, "user_id": "omar_rossi_1241", "n_gold_actions": 3, "write_actions": ["update_reservation_flights", "update_reservation_passengers", "update_reservation_baggages"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 5, "user_id": "omar_rossi_1241", "n_gold_actions": 3, "write_actions": ["update_reservation_flights", "update_reservation_passengers", "update_reservation_baggages"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 6, "user_id": "aarav_garcia_1177", "n_gold_actions": 1, "write_actions": ["update_reservation_flights"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 7, "user_id": "aarav_garcia_1177", "n_gold_actions": 1, "write_actions": ["update_reservation_flights"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 8, "user_id": "mohamed_silva_9265", "n_gold_actions": 2, "write_actions": ["cancel_reservation", "book_reservation"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 9, "user_id": "mohamed_silva_9265", "n_gold_actions": 4, "write_actions": ["cancel_reservation", "book_reservation", "book_reservation", "book_reservation"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 10, "user_id": "mia_kim_4397", "n_gold_actions": 2, "write_actions": ["cancel_reservation", "book_reservation"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 11, "user_id": "ivan_muller_7015", "n_gold_actions": 1, "write_actions": ["book_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 12, "user_id": "amelia_sanchez_4739", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 13, "user_id": "james_lee_6136", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 14, "user_id": "chen_lee_6825", "n_gold_actions": 5, "write_actions": ["update_reservation_baggages"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 15, "user_id": "james_patel_9828", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 16, "user_id": "ethan_martin_2396", "n_gold_actions": 2, "write_actions": ["send_certificate"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 17, "user_id": "liam_khan_2521", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 18, "user_id": "amelia_rossi_1297", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 19, "user_id": "raj_brown_5782", "n_gold_actions": 3, "write_actions": ["update_reservation_flights", "update_reservation_baggages"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 20, "user_id": "james_taylor_7043", "n_gold_actions": 3, "write_actions": ["update_reservation_flights"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 21, "user_id": "daiki_lee_6144", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 22, "user_id": "ivan_rossi_8555", "n_gold_actions": 5, "write_actions": ["update_reservation_flights", "update_reservation_flights"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 23, "user_id": "yara_garcia_1905", "n_gold_actions": 5, "write_actions": ["update_reservation_flights", "update_reservation_baggages"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 24, "user_id": "yara_garcia_1905", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 25, "user_id": "aarav_ahmed_6699", "n_gold_actions": 1, "write_actions": ["book_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 26, "user_id": "aarav_ahmed_6699", "n_gold_actions": 6, "write_actions": ["cancel_reservation", "update_reservation_flights"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": false}
+{"index": 27, "user_id": "aarav_ahmed_6699", "n_gold_actions": 5, "write_actions": ["cancel_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 28, "user_id": "amelia_davis_8890", "n_gold_actions": 11, "write_actions": ["cancel_reservation", "cancel_reservation", "cancel_reservation"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 29, "user_id": "amelia_davis_8890", "n_gold_actions": 8, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 30, "user_id": "sophia_martin_4574", "n_gold_actions": 10, "write_actions": ["cancel_reservation", "cancel_reservation"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 31, "user_id": "mohamed_hernandez_5188", "n_gold_actions": 7, "write_actions": ["cancel_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 32, "user_id": "sophia_silva_7557", "n_gold_actions": 4, "write_actions": ["book_reservation"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 33, "user_id": "sophia_silva_7557", "n_gold_actions": 20, "write_actions": ["cancel_reservation", "update_reservation_flights", "update_reservation_flights", "update_reservation_flights"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 34, "user_id": "daiki_muller_1116", "n_gold_actions": 7, "write_actions": ["update_reservation_flights", "cancel_reservation", "cancel_reservation"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 35, "user_id": "sophia_taylor_9065", "n_gold_actions": 2, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 36, "user_id": "sophia_taylor_9065", "n_gold_actions": 2, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 37, "user_id": "mei_brown_7075", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 38, "user_id": "sophia_silva_7557", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 39, "user_id": "sophia_silva_7557", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 40, "user_id": "sophia_silva_7557", "n_gold_actions": 6, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 41, "user_id": "anya_garcia_5901", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 42, "user_id": "anya_garcia_5901", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 43, "user_id": "anya_garcia_5901", "n_gold_actions": 2, "write_actions": ["update_reservation_passengers"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 44, "user_id": "anya_garcia_5901", "n_gold_actions": 2, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 45, "user_id": "noah_muller_9847", "n_gold_actions": 3, "write_actions": ["send_certificate"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 46, "user_id": "noah_muller_9847", "n_gold_actions": 4, "write_actions": ["send_certificate"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 47, "user_id": "raj_sanchez_7340", "n_gold_actions": 2, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 48, "user_id": "lucas_brown_4047", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 49, "user_id": "emma_kim_9957", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}

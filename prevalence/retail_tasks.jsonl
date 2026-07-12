@@ -1,0 +1,115 @@
+{"index": 0, "user_id": "yusuf_rossi_9620", "n_gold_actions": 5, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 1, "user_id": "yusuf_rossi_9620", "n_gold_actions": 5, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 2, "user_id": "yusuf_rossi_9620", "n_gold_actions": 12, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 3, "user_id": "yusuf_rossi_9620", "n_gold_actions": 13, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 4, "user_id": "yusuf_rossi_9620", "n_gold_actions": 14, "write_actions": ["modify_pending_order_items", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 5, "user_id": "mei_kovacs_8020", "n_gold_actions": 5, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 6, "user_id": "mei_kovacs_8020", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 7, "user_id": "mei_kovacs_8020", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 8, "user_id": "mei_kovacs_8020", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 9, "user_id": "mei_kovacs_8020", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 10, "user_id": "mia_garcia_4516", "n_gold_actions": 5, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 11, "user_id": "mia_garcia_4516", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 12, "user_id": "mia_garcia_4516", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 13, "user_id": "mia_garcia_4516", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 14, "user_id": "mia_garcia_4516", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 15, "user_id": "fatima_johnson_7581", "n_gold_actions": 7, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 16, "user_id": "fatima_johnson_7581", "n_gold_actions": 9, "write_actions": ["cancel_pending_order", "cancel_pending_order", "return_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 17, "user_id": "fatima_johnson_7581", "n_gold_actions": 6, "write_actions": ["modify_pending_order_address"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 18, "user_id": "mei_davis_8935", "n_gold_actions": 5, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 19, "user_id": "mei_davis_8935", "n_gold_actions": 7, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 20, "user_id": "ethan_garcia_1261", "n_gold_actions": 10, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 21, "user_id": "ethan_garcia_1261", "n_gold_actions": 12, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 22, "user_id": "ethan_garcia_1261", "n_gold_actions": 7, "write_actions": ["modify_user_address", "modify_pending_order_address", "modify_user_address"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 23, "user_id": "sofia_hernandez_5364", "n_gold_actions": 12, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": false}
+{"index": 24, "user_id": "sofia_hernandez_5364", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 25, "user_id": "isabella_johansson_2152", "n_gold_actions": 6, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 26, "user_id": "isabella_johansson_2152", "n_gold_actions": 8, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 27, "user_id": "isabella_johansson_2152", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 28, "user_id": "isabella_johansson_2152", "n_gold_actions": 11, "write_actions": ["return_delivered_order_items", "return_delivered_order_items", "return_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 29, "user_id": "isabella_johansson_2152", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 30, "user_id": "olivia_lopez_3865", "n_gold_actions": 13, "write_actions": ["return_delivered_order_items", "cancel_pending_order", "return_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": false}
+{"index": 31, "user_id": "olivia_lopez_3865", "n_gold_actions": 12, "write_actions": ["cancel_pending_order", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": false}
+{"index": 32, "user_id": "olivia_lopez_3865", "n_gold_actions": 13, "write_actions": ["cancel_pending_order", "cancel_pending_order", "return_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": false}
+{"index": 33, "user_id": "noah_patel_6952", "n_gold_actions": 6, "write_actions": ["modify_user_address"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 34, "user_id": "noah_patel_6952", "n_gold_actions": 6, "write_actions": ["modify_pending_order_address"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 35, "user_id": "aarav_santos_2259", "n_gold_actions": 7, "write_actions": ["return_delivered_order_items", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 36, "user_id": "daiki_sanchez_3253", "n_gold_actions": 10, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 37, "user_id": "daiki_sanchez_3253", "n_gold_actions": 10, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 38, "user_id": "daiki_sanchez_3253", "n_gold_actions": 11, "write_actions": ["cancel_pending_order"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 39, "user_id": "fatima_taylor_3452", "n_gold_actions": 7, "write_actions": ["modify_user_address"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 40, "user_id": "isabella_lopez_6490", "n_gold_actions": 4, "write_actions": ["modify_pending_order_payment"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 41, "user_id": "mei_patel_7272", "n_gold_actions": 10, "write_actions": ["modify_pending_order_address", "modify_pending_order_address", "modify_user_address", "modify_pending_order_items"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 42, "user_id": "mei_patel_7272", "n_gold_actions": 10, "write_actions": ["modify_pending_order_address", "modify_pending_order_address", "modify_user_address", "modify_pending_order_items"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 43, "user_id": "lucas_santos_6600", "n_gold_actions": 5, "write_actions": ["modify_user_address"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 44, "user_id": "aarav_anderson_8794", "n_gold_actions": 5, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 45, "user_id": "daiki_johnson_9523", "n_gold_actions": 5, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 46, "user_id": "daiki_johnson_9523", "n_gold_actions": 7, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 47, "user_id": "daiki_johnson_9523", "n_gold_actions": 7, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 48, "user_id": "daiki_johnson_9523", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 49, "user_id": "aarav_anderson_8794", "n_gold_actions": 10, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 50, "user_id": "chen_smith_8425", "n_gold_actions": 1, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 51, "user_id": "sofia_li_9219", "n_gold_actions": 7, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 52, "user_id": "sofia_li_9219", "n_gold_actions": 5, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 53, "user_id": "sofia_li_9219", "n_gold_actions": 6, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 54, "user_id": "amelia_silva_7726", "n_gold_actions": 12, "write_actions": ["cancel_pending_order", "cancel_pending_order", "return_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 55, "user_id": "amelia_silva_7726", "n_gold_actions": 13, "write_actions": ["cancel_pending_order", "cancel_pending_order", "return_delivered_order_items", "return_delivered_order_items"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 56, "user_id": "ivan_hernandez_6923", "n_gold_actions": 7, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 57, "user_id": "ivan_hernandez_6923", "n_gold_actions": 0, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 58, "user_id": "ivan_hernandez_6923", "n_gold_actions": 6, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 59, "user_id": "yusuf_taylor_7149", "n_gold_actions": 6, "write_actions": ["cancel_pending_order", "modify_pending_order_address"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 60, "user_id": "chen_johnson_4204", "n_gold_actions": 4, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 61, "user_id": "chen_johnson_4204", "n_gold_actions": 5, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 62, "user_id": "chen_johnson_4204", "n_gold_actions": 6, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 63, "user_id": "chen_johnson_4204", "n_gold_actions": 7, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 64, "user_id": "harper_moore_6183", "n_gold_actions": 8, "write_actions": ["exchange_delivered_order_items", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 65, "user_id": "james_kovacs_9247", "n_gold_actions": 3, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 66, "user_id": "aarav_lee_1982", "n_gold_actions": 5, "write_actions": ["cancel_pending_order"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 67, "user_id": "noah_ito_3850", "n_gold_actions": 5, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 68, "user_id": "noah_ito_3850", "n_gold_actions": 4, "write_actions": [], "n_writes": 0, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 69, "user_id": "emma_smith_8564", "n_gold_actions": 4, "write_actions": ["cancel_pending_order"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 70, "user_id": "sofia_hernandez_5364", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 71, "user_id": "ivan_khan_7475", "n_gold_actions": 2, "write_actions": ["modify_pending_order_address", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 72, "user_id": "ivan_khan_7475", "n_gold_actions": 2, "write_actions": ["modify_pending_order_address", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 73, "user_id": "fatima_wilson_7472", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 74, "user_id": "lei_li_6575", "n_gold_actions": 2, "write_actions": ["cancel_pending_order", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 75, "user_id": "liam_moore_4057", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 76, "user_id": "ava_nguyen_6646", "n_gold_actions": 2, "write_actions": ["cancel_pending_order", "cancel_pending_order"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 77, "user_id": "ivan_johnson_6036", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 78, "user_id": "yara_muller_8652", "n_gold_actions": 3, "write_actions": ["modify_pending_order_address", "modify_pending_order_items", "cancel_pending_order"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 79, "user_id": "emma_kovacs_9839", "n_gold_actions": 1, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 80, "user_id": "amelia_gonzalez_4098", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 81, "user_id": "james_kim_7213", "n_gold_actions": 2, "write_actions": ["cancel_pending_order", "cancel_pending_order"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 82, "user_id": "chen_silva_7485", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 83, "user_id": "chen_silva_7485", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 84, "user_id": "chen_silva_7485", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 85, "user_id": "yusuf_hernandez_6785", "n_gold_actions": 1, "write_actions": ["modify_pending_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 86, "user_id": "yusuf_hernandez_6785", "n_gold_actions": 2, "write_actions": ["modify_pending_order_items", "modify_user_address"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 87, "user_id": "yusuf_hernandez_6785", "n_gold_actions": 4, "write_actions": ["modify_pending_order_address", "modify_pending_order_address", "modify_pending_order_address", "modify_user_address"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 88, "user_id": "daiki_silva_2903", "n_gold_actions": 1, "write_actions": ["cancel_pending_order"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 89, "user_id": "raj_santos_9079", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 90, "user_id": "emma_kovacs_9839", "n_gold_actions": 1, "write_actions": ["cancel_pending_order"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 91, "user_id": "mei_ahmed_4909", "n_gold_actions": 2, "write_actions": ["return_delivered_order_items", "exchange_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 92, "user_id": "mei_ahmed_4909", "n_gold_actions": 2, "write_actions": ["return_delivered_order_items", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 93, "user_id": "lei_wilson_4541", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 94, "user_id": "lei_wilson_4541", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 95, "user_id": "lei_wilson_4541", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 96, "user_id": "lei_wilson_4541", "n_gold_actions": 2, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 97, "user_id": "yusuf_li_7255", "n_gold_actions": 2, "write_actions": ["modify_pending_order_address", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 98, "user_id": "yusuf_li_7255", "n_gold_actions": 2, "write_actions": ["modify_pending_order_address", "modify_pending_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 99, "user_id": "sofia_li_9219", "n_gold_actions": 3, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items", "cancel_pending_order"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 100, "user_id": "sofia_li_9219", "n_gold_actions": 2, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 101, "user_id": "liam_thomas_7882", "n_gold_actions": 2, "write_actions": ["modify_pending_order_items", "return_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 102, "user_id": "noah_ito_3850", "n_gold_actions": 3, "write_actions": ["modify_pending_order_address", "modify_pending_order_items", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 103, "user_id": "noah_ito_3850", "n_gold_actions": 3, "write_actions": ["modify_pending_order_address", "modify_pending_order_items", "exchange_delivered_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 104, "user_id": "lucas_brown_6720", "n_gold_actions": 4, "write_actions": ["return_delivered_order_items", "return_delivered_order_items", "modify_pending_order_address", "modify_pending_order_items"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 105, "user_id": "lucas_brown_6720", "n_gold_actions": 4, "write_actions": ["return_delivered_order_items", "return_delivered_order_items", "modify_pending_order_address", "modify_pending_order_items"], "n_writes": 4, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 106, "user_id": "aarav_anderson_8794", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 107, "user_id": "sofia_thomas_1518", "n_gold_actions": 1, "write_actions": ["exchange_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 108, "user_id": "yara_ito_8499", "n_gold_actions": 2, "write_actions": ["exchange_delivered_order_items", "exchange_delivered_order_items"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 109, "user_id": "yusuf_gonzalez_8900", "n_gold_actions": 1, "write_actions": ["return_delivered_order_items"], "n_writes": 1, "ge2_writes": false, "adjacent_write_pair": false}
+{"index": 110, "user_id": "sophia_martin_8570", "n_gold_actions": 3, "write_actions": ["modify_pending_order_address", "modify_user_address", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 111, "user_id": "sophia_martin_8570", "n_gold_actions": 3, "write_actions": ["modify_pending_order_address", "modify_user_address", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 112, "user_id": "yara_silva_7567", "n_gold_actions": 3, "write_actions": ["modify_pending_order_items", "modify_pending_order_address", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 113, "user_id": "yara_silva_7567", "n_gold_actions": 3, "write_actions": ["modify_pending_order_items", "modify_pending_order_address", "modify_pending_order_items"], "n_writes": 3, "ge2_writes": true, "adjacent_write_pair": true}
+{"index": 114, "user_id": "yara_muller_8652", "n_gold_actions": 2, "write_actions": ["cancel_pending_order", "cancel_pending_order"], "n_writes": 2, "ge2_writes": true, "adjacent_write_pair": true}
