@@ -25,7 +25,7 @@ whether the pathway CAN produce a turn with 2 tool calls at all.
     needs to observe for this model, and the paper must say so rather than
     report "Gemini never leaks" as a safety finding.
 
-Uses the exact same OpenRouterProvider (providers_v2.py) as the main study --
+Uses the exact same OpenRouterProvider (providers_openrouter.py) as the main study --
 same client, same tool_schema()/init_messages() methods, same
 require_parameters routing -- so this is the same instrument with one tool
 deleted, not a different methodology.
@@ -50,7 +50,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from exposure.tasks import TASKS  # noqa: E402
-from exposure.providers_v2 import OpenRouterProvider  # noqa: E402
+from exposure.providers_openrouter import OpenRouterProvider  # noqa: E402
 
 
 def get_compound_transfer_benign_tools():

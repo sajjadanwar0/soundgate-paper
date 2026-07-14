@@ -49,16 +49,17 @@ QUERIES: list[dict] = [
     {"tag": "Q4-cancel", "query": "langgraph OR crewai agent cancellation abort tool still executes background task not stopped"},
 ]
 
-# Seed IDs carried from the review pass (langchain-ai/langgraph unless noted).
+# Seed incident IDs (langchain-ai/langgraph unless noted).
 SEED_IDS = [6208, 6158, 5952, 3875, 6626, 6792, 4796]
 
-# Unverified leads from prior notes that did NOT re-confirm this session.
-# Recorded so they are not silently dropped, and not asserted as evidence.
+# Leads that did not re-confirm on verification (search date 2026-07-02).
+# Recorded for transparency so they are neither silently dropped nor asserted
+# as evidence; excluded from every count in the paper.
 UNVERIFIED_LEADS = [
-    {"ref": "forum thread 2964", "note": "prior notes cited forum thread 2964; not located 2026-07-02. "
-                                         "The real multi-interrupt forum thread found is 1657 (see INCIDENTS). VERIFY or drop."},
-    {"ref": "blog.raed.dev/posts/langgraph-hitl/", "note": "cited in review notes as a Mar-2026 practitioner analysis of "
-                                                           "double-execution; not re-fetched this session. VERIFY before citing."},
+    {"ref": "forum thread 2964", "note": "not located on 2026-07-02; the located "
+                                         "multi-interrupt thread is 1657 (see INCIDENTS)."},
+    {"ref": "blog.raed.dev/posts/langgraph-hitl/", "note": "a Mar-2026 practitioner "
+                                                           "analysis of double-execution; not re-fetched, so unverified."},
 ]
 
 R_PY = "langchain-ai/langgraph"

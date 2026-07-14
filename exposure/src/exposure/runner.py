@@ -359,7 +359,7 @@ def main() -> None:
 
 # --- v2 providers (OpenRouter) registered before argparse reads PROVIDERS ---
 try:
-    from .providers_v2 import NEW_PROVIDERS, NEW_DEFAULT_MODELS
+    from .providers_openrouter import NEW_PROVIDERS, NEW_DEFAULT_MODELS
     PROVIDERS.update(NEW_PROVIDERS)
     DEFAULT_MODELS.update(NEW_DEFAULT_MODELS)
 except Exception:

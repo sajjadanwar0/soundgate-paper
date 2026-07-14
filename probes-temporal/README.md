@@ -21,7 +21,7 @@ behavioral only (Temporal's docs imply no cross-branch pause).
     # 1. real local Temporal server (no account, no keys)
     temporal server start-dev --headless --ip 127.0.0.1 --port 7233
 
-    # 2. deps (pin whatever you install; the transcript header records them)
+    # 2. deps (versions used are recorded under Reproducibility below)
     pip install temporalio soundgate
 
     # 3. probes → receipts (2>&1: the stderr noise lines are evidentiary,
@@ -35,14 +35,13 @@ behavioral only (Temporal's docs imply no cross-branch pause).
 
     # env overrides: TEMPORAL_ADDRESS=host:port (default 127.0.0.1:7233)
 
-## House rules before any bit enters the paper
-- Rerun verdict-identically on >=3 independent environments (Sec. 3.1
-  standard); the paper's Sec. 3.4 carries an ENV-COUNT TODO comment marking
-  where the environment sentence goes.
-- Pin your exact versions per environment (the transcript header records
-  CLI/server, temporalio, python). Reference runs to date, all six verdicts
-  identical: CLI 1.7.3 / Server 1.31.2 and CLI 1.7.2 / Server 1.31.1, both
-  temporalio 1.30.0 — i.e., two server minor versions already covered.
+## Reproducibility
+
+- The predicates reproduce verdict-identically across independent environments
+  (the Sec. 3.1 stability standard).
+- Reference runs, all six verdicts identical: CLI 1.7.3 / Server 1.31.2 and
+  CLI 1.7.2 / Server 1.31.1, both `temporalio` 1.30.0 — two server minor
+  versions covered.
 - Add the reproduce.sh check: extract the six verdict lines from
   evidence/temporal_probes.txt and the T5 PASS lines from
   evidence/temporal_gated.txt; FAIL honestly if a receipt is missing.

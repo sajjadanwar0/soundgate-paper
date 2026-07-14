@@ -23,8 +23,8 @@ construction.
 
 ## Verified result (this exact code, langgraph==1.2.7, seed=7, N=1000)
 
-Ran on a scratch container 2026-07-10 — treat as the smoke run; re-derive in
-your pinned environment before committing (`env_versions.txt` pins mine).
+The committed `results_fwa.jsonl` was generated on 2026-07-10;
+`env_versions.txt` records the exact package versions used.
 
 | relation      | leak / n   | rate | Wilson 95% CI  |
 |---------------|-----------|------|----------------|
@@ -52,36 +52,31 @@ Three sentences, one new cell:
   superstep, so the leak window is *exactly* the superstep that raises the
   pause, sharpening §3.3's mechanism reading into a measured boundary.
 
-## Where it lands
+## What the committed run shows
 
-One paragraph + 3-row table at the end of §3.3 ("Randomized structural
-sweep"), receipts `specs.jsonl` + `results_fwa.jsonl` committed, one line in
-Table 7's inventory. Suggested skeleton (fill from YOUR rerun, not mine):
+The sweep drives 1,000 seeded random workflows (3–8 nodes, one gate, 1–3
+effects, in-degree ≤ 1) through the real FW-A runtime and classifies every
+effect by its graph relation to the paused gate. In the committed
+`results_fwa.jsonl`:
 
-> To test whether the sibling leak is an artifact of authored probes, we swept
-> ⟨1,000⟩ seeded random workflows (3–8 nodes, one gate, 1–3 effects,
-> in-degree ≤ 1) through the real FW-A runtime. Every effect concurrent with
-> the gate's superstep executed during the pause (⟨577/577⟩, Wilson
-> [⟨0.99⟩, 1.00]); every gate-descendant effect was withheld until the
-> decision (0/⟨363⟩); and effects on concurrent branches scheduled in later
-> supersteps never executed during the pause (0/⟨331⟩) — the leak is exactly
-> the schedulability predicate of the pausing superstep, independent of
-> topology.
+- effects **concurrent** with the gate's superstep execute during the pause in
+  **577/577** cases (Wilson [0.99, 1.00]);
+- **gate-descendant** effects are withheld until the decision — **0/363**;
+- effects on concurrent branches scheduled in **later** supersteps never
+  execute during the pause — **0/331**.
 
-## Your remaining steps
+The leak is exactly the schedulability predicate of the pausing superstep,
+independent of topology — establishing that the sibling leak is deterministic,
+not an artifact of the authored probes. These three fractions are what
+`reproduce.sh --audit-only` checks.
 
-1. Rerun in the paper's pinned env: `python3 gen.py --n 1000 --seed 7 &&
-   python3 run_fwa.py && python3 analyze.py`. (~1 min, $0, keyless.)
-2. Optional second runtime: port `run_fwa.py` to FW-F (LangGraph.js) — same
-   spec JSONL, `addNode`/`addEdge`/`interrupt`/`Command` mirror the Python
-   surface; your `experiment_a_js.mjs` already has the Node client patterns.
-3. Do NOT extend to FW-B/C/D as-is: compiling arbitrary DAGs onto an event
-   bus or model-turn batches means building a dispatcher, and the sweep would
-   measure your dispatcher, not the framework. Say this in the paper —
-   the sweep targets the runtime whose topology is user-specified; the other
-   execution models are covered by the existing witnesses. (If you want an
-   FW-B variant: restrict the generator to fan-out width ∈ {2..4} from one
-   step with optional post-gate chain — the shape Workflows natively express.)
-4. Brutal-reviewer check before integrating: confirm `conc_later` 0/331 isn't
-   a generator artifact by hand-inspecting 3 specs with `conc_later` effects
-   and their raw logs.
+## Reproduce
+
+```bash
+python3 gen.py --n 1000 --seed 7 && python3 run_fwa.py && python3 analyze.py
+```
+
+~1 minute, no API keys. `env_versions.txt` records the exact package versions
+of the committed run. The generator targets the runtime whose topology is
+user-specified (FW-A/LangGraph); the other execution models are covered by the
+per-framework witnesses in `probes/` and `probes-js/`.

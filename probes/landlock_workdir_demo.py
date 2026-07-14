@@ -64,11 +64,9 @@ NR_landlock_add_rule = 445
 NR_landlock_restrict_self = 446
 
 # Access-right bits per the kernel UAPI (include/uapi/linux/landlock.h):
-# EXECUTE=1<<0, WRITE_FILE=1<<1, READ_FILE=1<<2, READ_DIR=1<<3, ...,
-# MAKE_REG=1<<8. An earlier revision of this script defined WRITE_FILE as
-# 1<<3 (= READ_DIR), so the ruleset handled directory reads instead of file
-# writes and every write sailed through unhandled -- which is exactly what
-# the enforcement self-test below exists to catch, and did.
+# EXECUTE=1<<0, WRITE_FILE=1<<1, READ_FILE=1<<2, READ_DIR=1<<3, MAKE_REG=1<<8.
+# WRITE_FILE must be 1<<1: using 1<<3 (READ_DIR) would leave file writes
+# unhandled by the ruleset, which the enforcement self-test below detects.
 LANDLOCK_ACCESS_FS_WRITE_FILE = 1 << 1
 LANDLOCK_ACCESS_FS_READ_FILE = 1 << 2
 LANDLOCK_ACCESS_FS_MAKE_REG = 1 << 8

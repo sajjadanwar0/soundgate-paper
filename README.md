@@ -30,10 +30,13 @@ paper; a missing or drifted receipt fails loudly.
 |---|---|---|---|
 | [`probes/`](probes/) | Model-free differential probes that **measure** the control-plane gap across LangGraph, LlamaIndex, MS Agent Framework, OpenAI Agents SDK, CrewAI | Python (uv) | No |
 | [`probes-js/`](probes-js/) | The same probe design on **LangGraph.js** (Node), separating framework semantics from host-language concurrency | Node | No |
+| [`probes-temporal/`](probes-temporal/) | The Section-3 predicates on **Temporal**, the durable-execution contrast arm (excluded from every recurrence denominator) | Python (uv) | No |
 | [`exposure/`](exposure/) | The **model exposure** study: do real models emit the leak-triggering plan shape, and at what rate | Python (uv) | For live re-run |
 | [`corpus/`](corpus/) | The verified **public-incident corpus** and the tracker sweep behind the occurrence lower bound | Python (uv) | No |
 | [`soundgate/`](soundgate/) | The Rust **reference gate** that repairs the violations, its evidence receipts, the end-to-end integrations, eBPF/namespace mediation, and the Python (PyO3) bindings | Rust + Python | For live e2e |
 | [`formal/`](formal/) | **Mechanized verification**: TLA+/TLC + TLAPS models and Verus model, with checker receipts | TLA+ / Verus | No |
+| [`randgraph/`](randgraph/) | The **randomized structural sweep**: 1,000 generated workflows establishing the leak is deterministic, not incidental | Python (uv) | No |
+| [`prevalence/`](prevalence/) | The **multi-effect prevalence** analysis over τ-bench gold solutions (how many tasks cross an approval gate twice) | Python | No |
 | [`scripts/`](scripts/) | The static **mediation linter** (`mediation_lint.py`) | Python | No |
 | `paper/` | The manuscript (`soundgate.tex`) | LaTeX | — |
 

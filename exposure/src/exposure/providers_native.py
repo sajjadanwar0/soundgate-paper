@@ -38,7 +38,7 @@ requires a second, vendor-controlled path per model:
                      id (historically meta-llama/Llama-3.3-70B-Instruct-Turbo).
 
 All three reuse the OpenAI-SDK ChatCompletions turn shape already validated
-by providers_v2.OpenRouterProvider: no seed, temperature passthrough, tools
+by providers_openrouter.OpenRouterProvider: no seed, temperature passthrough, tools
 passthrough, model-native parallel_tool_calls default. Identical task set,
 identical metric, N=100 -- only the serving path changes.
 

@@ -65,5 +65,5 @@ User questions and practitioner write-ups establishing the problem is real and a
 
 ## Unverified leads (recorded, NOT counted as evidence)
 
-- **forum thread 2964** -- prior notes cited forum thread 2964; not located 2026-07-02. The real multi-interrupt forum thread found is 1657 (see INCIDENTS). VERIFY or drop.
-- **blog.raed.dev/posts/langgraph-hitl/** -- cited in review notes as a Mar-2026 practitioner analysis of double-execution; not re-fetched this session. VERIFY before citing.
+- **forum thread 2964** -- not located on 2026-07-02; the located multi-interrupt thread is 1657 (see INCIDENTS).
+- **blog.raed.dev/posts/langgraph-hitl/** -- a Mar-2026 practitioner analysis of double-execution; not re-fetched, so unverified.
