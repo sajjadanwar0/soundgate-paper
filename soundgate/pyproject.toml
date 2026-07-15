@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "soundgate"
-version = "0.1.0"
+version = "0.1.3"
 description = "External effect-admission gate for LLM-agent frameworks (Rust core, Python bindings)"
 readme = "README_python.md"
 license = { text = "MIT" }

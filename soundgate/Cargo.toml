@@ -1,6 +1,6 @@
 [package]
 name = "soundgate"
-version = "0.1.0"
+version = "0.1.3"
 edition = "2024"
 description = "Environment-external effect gate for agent-framework stop primitives"
 license = "MIT"
@@ -18,17 +18,9 @@ tracing            = { version = "0.1",                           optional = tru
 tracing-subscriber = { version = "0.3",  features = ["env-filter"], optional = true }
 pyo3 = { version = "0.23", features = ["extension-module", "abi3-py38"], optional = true }
 
-
-# Test-only in practice: linked solely into tests/proptest_invariants.rs when
-# the proptest-tests feature is on. Lives here (optional) because Cargo does
-# not support optional dev-dependencies; never built in the default profile.
 proptest = { version = "1", optional = true }
 
 [features]
-# Full proptest invariant suite (tests/proptest_invariants.rs). Off by default
-# so the base build needs no proptest and works on older toolchains
-# (proptest 1.x's tree needs rustc >= 1.85). One command enables everything:
-#   cargo test --features proptest-tests
 conformance = []
 proptest-tests = ["dep:proptest"]
 replication = [
@@ -40,11 +32,8 @@ python = ["dep:pyo3"]
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
-# MSRV-friendly pin: criterion's `clap ^4` otherwise resolves to a
-# clap_builder requiring edition2024 (cargo >= 1.85). Harmless on newer
-# toolchains; keeps `cargo bench` working from cargo 1.75.
 clap = "=4.4.18"
-half = "=2.2.1"     # same reason: 2.7 requires rustc 1.81
+half = "=2.2.1"
 
 [[bench]]
 name = "admission"
@@ -64,6 +53,4 @@ loom = "0.7"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(loom)'] }
 
 [lib]
-# ADD this table (the crate currently has no explicit [lib]).
-# cdylib -> the Python extension; rlib -> keeps bins/benches/tests building.
 crate-type = ["cdylib", "rlib"]
