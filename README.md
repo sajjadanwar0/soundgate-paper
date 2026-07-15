@@ -38,8 +38,6 @@ paper; a missing or drifted receipt fails loudly.
 | [`randgraph/`](randgraph/) | The **randomized structural sweep**: 1,000 generated workflows establishing the leak is deterministic, not incidental | Python (uv) | No |
 | [`prevalence/`](prevalence/) | The **multi-effect prevalence** analysis over τ-bench gold solutions (how many tasks cross an approval gate twice) | Python | No |
 | [`scripts/`](scripts/) | The static **mediation linter** (`mediation_lint.py`) | Python | No |
-| `paper/` | The manuscript (`soundgate.tex`) | LaTeX | — |
-
 Each folder has its own `README.md` with exact commands.
 
 ## Python package (use the gate from Python agents)
