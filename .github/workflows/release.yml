@@ -1,37 +1,17 @@
-# .github/workflows/release.yml
-#
-# Cross-platform wheels for `soundgate` (Linux x86_64/aarch64, macOS Intel/ARM,
-# Windows) + sdist, published to PyPI via Trusted Publishing (no stored token).
-#
-# The crate lives in the soundgate/ subdirectory of this repo, so every build
-# step sets working-directory: soundgate and builds with --features python.
-# abi3 (abi3-py38 in Cargo.toml) means one wheel per platform covers CPython 3.8+.
-#
-# ── One-time setup on PyPI ────────────────────────────────────────────────
-#   pypi.org → project `soundgate` → Publishing → Add a trusted publisher → GitHub
-#     Owner:            sajjadanwar0
-#     Repository:       soundgate-paper
-#     Workflow name:    release.yml
-#     Environment name: (leave BLANK to match this file as-is; see note at the
-#                        publish job if you want to use a GitHub Environment)
-#
-# ── How to use ────────────────────────────────────────────────────────────
-#   Rehearsal (build all platforms, NO publish): Actions → this workflow → Run workflow
-#     → download the artifacts to inspect, or `twine upload -r testpypi` them by hand.
-#   Real release: bump `version` in BOTH pyproject.toml and Cargo.toml (e.g. 0.1.1),
-#     then:  git commit -am "release: v0.1.1" && git tag v0.1.1 && git push origin main --tags
-#   (0.1.0 is already on PyPI and immutable — cross-platform wheels ship as a NEW version.)
-
 name: release
 
 on:
   push:
     tags:
       - "v*"
-  workflow_dispatch: {}      # manual run = cross-platform build rehearsal (publish job is skipped)
+  workflow_dispatch: {}
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CRATE_DIR: soundgate
@@ -40,6 +20,7 @@ env:
 jobs:
   linux:
     runs-on: ubuntu-22.04
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -65,11 +46,12 @@ jobs:
 
   macos:
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-14      # Apple Silicon
+          - runner: macos-14
             target: aarch64
     steps:
       - uses: actions/checkout@v4
@@ -91,6 +73,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -116,6 +99,7 @@ jobs:
 
   sdist:
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Build sdist
@@ -133,16 +117,11 @@ jobs:
   publish:
     name: Publish to PyPI (Trusted Publishing)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [linux, macos, windows, sdist]
-    # Publish ONLY on a version tag. A manual (workflow_dispatch) run builds all
-    # platforms as a rehearsal and stops here.
     if: startsWith(github.ref, 'refs/tags/')
-    # To harden with a GitHub Environment: create one named `pypi`
-    # (repo Settings → Environments), set the SAME name in the PyPI trusted
-    # publisher, and uncomment the next line.
-    # environment: pypi
     permissions:
-      id-token: write         # REQUIRED for Trusted Publishing (OIDC)
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -155,6 +134,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
-          # ── TestPyPI rehearsal instead of real PyPI ──
-          # Set up a trusted publisher on test.pypi.org too, then uncomment:
-          # repository-url: https://test.pypi.org/legacy/
