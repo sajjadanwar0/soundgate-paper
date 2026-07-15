@@ -76,3 +76,4 @@ Thumbs.db
 /*.zip
 /*.tar.gz
 _*.log
+/soundgate/evidence/concurrent_bench.txt
