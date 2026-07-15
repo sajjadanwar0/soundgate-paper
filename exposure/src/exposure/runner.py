@@ -1,42 +1,3 @@
-"""E-EXPOSURE runner. See tasks.py for the pre-registered design.
-
-Conditions fixed a priori:
-  - Provider defaults for parallelism are UNTOUCHED (OpenAI parallel_tool_calls
-    left unset; Anthropic disable_parallel_tool_use left unset). We measure
-    what integrators get out of the box.
-  - temperature=1.0 both providers (natural decoding), single sample per run,
-    N runs per (task, model). OpenAI seed=BASE+run_idx (best-effort determinism
-    where supported); Anthropic has no seed parameter.
-  - max_turns assistant turns; benign tool calls get canned results and the
-    loop continues; the run STOPS at the first turn containing the
-    consequential tool (never executed). A run that finishes or hits max_turns
-    without the consequential call is recorded as not-called.
-
-RESUME SEMANTICS: output is append-only JSONL, flushed per run. On start the
-runner loads --out and SKIPS every (task_id, run_idx) that already has a
-non-error record for the SAME provider+model; keys whose only records are
-errors are re-run. So after a network death, rerunning the identical command
-continues where it stopped, and a smoke run into the same file is simply
-skipped by the battery. Records are never rewritten; the analyzer
-deduplicates by (provider, model, task_id, run_idx), keeping the first
-non-error record. Changing --temperature or --max-turns mid-file is NOT
-detected -- use a fresh --out for changed conditions.
-
-Infrastructure hardening (does not affect the measured distribution):
-clients are constructed with timeout=90 s and max_retries=4, so a dead
-network fails fast into an error record instead of hanging on the SDK's
-600 s default.
-
-BRUTAL-REVIEWER SCOPE NOTES (carry into the paper's threats section):
-  - This measures raw-API plan shapes, deliberately framework-free; the E-E2E
-    demo covers the framework path. Framework prompt scaffolds could shift
-    rates either way.
-  - The task battery is 10 authored tasks, not sampled from production
-    traffic; per-task heterogeneity is reported so nobody averages away the
-    variance. Rates generalize to these task shapes, not to "agents".
-  - Canned benign results are frictionless; real tool latency/failure could
-    change plan shapes.
-"""
 from __future__ import annotations
 
 import argparse
@@ -46,19 +7,18 @@ import os
 import sys
 import time
 from dataclasses import dataclass
-
+from openai import OpenAI
 from .tasks import SYSTEM_PROMPT, Task, Tool, get_tasks
+import anthropic
 
-SEED_BASE = 1000       # pre-registered; OpenAI seed = SEED_BASE + run_idx
-CLIENT_TIMEOUT_S = 90  # infra only: fail fast instead of hanging on dead links
+SEED_BASE = 1000
+CLIENT_TIMEOUT_S = 90
 CLIENT_MAX_RETRIES = 4
-
 
 @dataclass
 class TurnRecord:
-    tool_calls: list[str]          # tool names emitted this assistant turn
+    tool_calls: list[str]
     had_text: bool
-
 
 @dataclass
 class RunRecord:
@@ -69,30 +29,20 @@ class RunRecord:
     model: str
     run_idx: int
     temperature: float
-    turns: list[dict]              # serialized TurnRecords
+    turns: list[dict]
     consequential_tool: str
     consequential_called: bool
     consequential_turn_idx: int | None
     siblings_in_consequential_turn: int | None
-    parallel_exposure: bool        # PRIMARY event: called AND >=1 sibling
-    stopped_reason: str            # "consequential" | "final_answer" | "max_turns" | "error"
+    parallel_exposure: bool
+    stopped_reason: str
     error: str | None
     wall_s: float
-
-
-# --------------------------------------------------------------------------
-# Providers. Each returns, for one assistant turn, the list of tool calls
-# [(call_id, name)] given the running provider-native message list, and
-# mutates that list by appending the assistant turn. `add_tool_results`
-# appends canned results in the provider's native shape.
-# --------------------------------------------------------------------------
 
 class OpenAIProvider:
     name = "openai"
 
     def __init__(self, model: str, temperature: float):
-        from openai import OpenAI  # verified: openai 2.x
-
         self.client = OpenAI(timeout=CLIENT_TIMEOUT_S, max_retries=CLIENT_MAX_RETRIES)
         self.model = model
         self.temperature = temperature
@@ -123,24 +73,22 @@ class OpenAIProvider:
             tools=tools,
             temperature=self.temperature,
             seed=SEED_BASE + run_idx,
-            # parallel_tool_calls deliberately NOT set: provider default.
         )
+
         msg = resp.choices[0].message
         messages.append(msg.model_dump(exclude_none=True))
         calls = [(c.id, c.function.name) for c in (msg.tool_calls or [])]
+
         return calls, bool(msg.content)
 
     def add_tool_results(self, messages: list[dict], results: list[tuple[str, str, str]]):
         for call_id, _name, payload in results:
             messages.append({"role": "tool", "tool_call_id": call_id, "content": payload})
 
-
 class AnthropicProvider:
     name = "anthropic"
 
     def __init__(self, model: str, temperature: float):
-        import anthropic  # verified: anthropic 0.115.x
-
         self.client = anthropic.Anthropic(
             timeout=CLIENT_TIMEOUT_S, max_retries=CLIENT_MAX_RETRIES
         )
@@ -164,15 +112,17 @@ class AnthropicProvider:
             messages=messages,
             tools=tools,
             temperature=self.temperature,
-            # tool_choice deliberately NOT set: default auto, parallel allowed.
         )
+
         blocks = resp.content
+
         messages.append(
             {"role": "assistant",
              "content": [b.model_dump(exclude_none=True) for b in blocks]}
         )
         calls = [(b.id, b.name) for b in blocks if getattr(b, "type", "") == "tool_use"]
         had_text = any(getattr(b, "type", "") == "text" and getattr(b, "text", "").strip() for b in blocks)
+
         return calls, had_text
 
     def add_tool_results(self, messages: list[dict], results: list[tuple[str, str, str]]):
@@ -184,16 +134,7 @@ class AnthropicProvider:
              ]}
         )
 
-
 class MockProvider:
-    """Keyless harness validation. Scripted plan shapes by (task_idx, run_idx):
-      run % 4 == 0: consequential + 1 benign sibling, turn 1  (exposure)
-      run % 4 == 1: benign turn 1, then solo consequential turn 2 (called, no exposure)
-      run % 4 == 2: solo consequential, turn 1 (called, no exposure)
-      run % 4 == 3: benign turn 1, then final answer (never called)
-    So per task with N=4k runs: called_rate=3/4, exposure_given_called=1/3.
-    """
-
     name = "mock"
 
     def __init__(self, model: str, temperature: float):
@@ -232,7 +173,6 @@ class MockProvider:
 PROVIDERS = {"openai": OpenAIProvider, "anthropic": AnthropicProvider, "mock": MockProvider}
 DEFAULT_MODELS = {"openai": "gpt-4o", "anthropic": "claude-sonnet-4-6", "mock": "mock-1"}
 
-
 def run_one(provider, task: Task, run_idx: int, max_turns: int) -> RunRecord:
     t0 = time.monotonic()
     tools_by_name = {t.name: t for t in task.tools}
@@ -259,12 +199,12 @@ def run_one(provider, task: Task, run_idx: int, max_turns: int) -> RunRecord:
                 called_idx = len(turns) - 1
                 siblings = sum(1 for n in names if n != cons)
                 stopped = "consequential"
-                break  # NEVER execute the consequential tool
+                break
             results = [
                 (cid, n, tools_by_name[n].canned_result or "{}") for cid, n in calls
             ]
             provider.add_tool_results(messages, results)
-    except Exception as e:  # record, do not crash the batch
+    except Exception as e:
         stopped, error = "error", f"{type(e).__name__}: {e}"
 
     return RunRecord(
@@ -286,7 +226,6 @@ def run_one(provider, task: Task, run_idx: int, max_turns: int) -> RunRecord:
         wall_s=round(time.monotonic() - t0, 3),
     )
 
-
 def load_done(path: str, provider: str, model: str) -> set[tuple[str, int]]:
     """(task_id, run_idx) keys with a non-error record for this provider+model."""
     done: set[tuple[str, int]] = set()
@@ -300,13 +239,12 @@ def load_done(path: str, provider: str, model: str) -> set[tuple[str, int]]:
             try:
                 r = json.loads(line)
             except json.JSONDecodeError:
-                continue  # torn final line from a hard kill: re-run that key
+                continue
             if r.get("error"):
-                continue  # errored keys are re-run
+                continue
             if r.get("provider") == provider and r.get("model") == model:
                 done.add((r["task_id"], r["run_idx"]))
     return done
-
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="E-EXPOSURE runner (see tasks.py)")
@@ -323,6 +261,7 @@ def main() -> None:
     model = args.model or DEFAULT_MODELS[args.provider]
     tasks = get_tasks(args.tasks.split(",") if args.tasks else None)
     runs = args.runs
+
     if args.smoke:
         tasks, runs = tasks[:1], 1
 
@@ -338,8 +277,10 @@ def main() -> None:
 
     todo = [(t, i) for t in tasks for i in range(runs) if (t.task_id, i) not in done]
     skipped = len(tasks) * runs - len(todo)
+
     if skipped:
         print(f"RESUME: {skipped} run(s) already recorded in {out}; {len(todo)} to go")
+
     if not todo:
         print("nothing to do")
         return
@@ -356,8 +297,6 @@ def main() -> None:
                   + (f"  ({rec.error})" if rec.error else ""))
     print(f"\nwrote {out}")
 
-
-# --- v2 providers (OpenRouter) registered before argparse reads PROVIDERS ---
 try:
     from .providers_openrouter import NEW_PROVIDERS, NEW_DEFAULT_MODELS
     PROVIDERS.update(NEW_PROVIDERS)
@@ -365,15 +304,12 @@ try:
 except Exception:
     pass
 
-
-
 try:
     from .providers_native import NATIVE_PROVIDERS, NATIVE_DEFAULT_MODELS
     PROVIDERS.update(NATIVE_PROVIDERS)
     DEFAULT_MODELS.update(NATIVE_DEFAULT_MODELS)
 except Exception:
     pass
-
 
 if __name__ == "__main__":
     main()

@@ -1,32 +1,7 @@
-#!/usr/bin/env python3
-"""classify_corpus.py -- turn the 130-candidate sweep into a review queue.
-
-This does NOT decide direct/adjacent/context for you (that requires reading
-each report and is the whole point of the conservative protocol). It pulls
-each candidate's title + body via the GitHub API, applies the axis-keyword
-rubric as a *suggestion only*, and writes a queue you fill in by hand. The
-paper's counts stay frozen until you set every VERDICT.
-
-Usage:
-    export GITHUB_TOKEN=ghp_...        # optional but lifts 60/hr -> 5000/hr
-    python3 classify_corpus.py results/sweep_results.jsonl \
-            --out results/classify_queue.md
-
-Rubric (from seeds.py; conservative):
-  direct   = the report ACTUALLY exhibits a stop-primitive failure:
-             effect executes during an approval pause / after reject;
-             resume double-executes an effect; cancel orphans an effect;
-             timeout zombie lands after the deadline.
-  adjacent = same root cause, but the report is a fix/discussion/feature ask
-             rather than a reproduced failure.
-  context  = user question, practitioner note, or tangential complaint.
-Anything you cannot confirm from the body => context (never inflate to direct).
-"""
 import argparse, json, os, sys, time, urllib.request, urllib.error, re
 
 API = "https://api.github.com/repos/{repo}/issues/{num}"
 
-# suggestion keywords per axis -- ONLY to sort the queue, never to set a verdict
 HINTS = {
     "A1": ["during pause", "while paused", "parallel", "sibling", "await approval",
            "lost tool call", "loses tool call", "batch"],

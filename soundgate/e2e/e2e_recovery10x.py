@@ -1,24 +1,3 @@
-"""E-E2E-RECOVERY10X: WAL recovery at 10x the paper's measured log (keyless).
-
-Sec. 5.5 reports recovery replaying the 170,600-event (10.5 MB) accounting
-WAL in 1.9 s on the container floor (~90k events/s) before the listener
-opens. R4 asks for recovery at scale. This script synthesizes a WAL ten
-times that size in the gate's exact durable-event format (the format of the
-committed e2e/e2e_test.wal: released / cancelled records), starts the gate
-on it, and measures the fail-closed window -- process spawn to first
-successful ping -- since nothing is admitted until the state is restored.
-
-State is then verified, not assumed: a replayed identity from the log
-refuses as a duplicate, a cancelled run's late submission refuses at the
-fence, and fresh work releases.
-
-Log shape mirrors the accounting run's population at 10x: 1,706,000 events,
-of which 1,700,000 are unique releases across 2,000 runs and 6,000 are
-run-cancellation fences (so fence compaction and the released-set both get
-exercised at scale).
-
-Run:  cargo build --release && python3 e2e/e2e_recovery10x.py
-"""
 import json
 import os
 import socket
@@ -34,7 +13,6 @@ N_RELEASED = 1_700_000
 N_RUNS = 2_000
 N_CANCELLED = 6_000
 
-
 def synthesize(path: Path) -> tuple[int, float]:
     t0 = time.time()
     with open(path, "w") as f:
@@ -46,7 +24,6 @@ def synthesize(path: Path) -> tuple[int, float]:
             f.write(json.dumps({"ev": "cancelled",
                                 "run_id": f"c{j}"}) + "\n")
     return N_RELEASED + N_CANCELLED, time.time() - t0
-
 
 def wait_listening(addr, deadline_s=600.0) -> float:
     """Poll until the listener accepts and answers ping; return wall time."""
@@ -63,12 +40,10 @@ def wait_listening(addr, deadline_s=600.0) -> float:
             time.sleep(0.1)
     raise TimeoutError("gate never opened its listener")
 
-
 def call(sock_rf, req):
     sock, rf = sock_rf
     sock.sendall((json.dumps(req) + "\n").encode())
     return json.loads(rf.readline())["verdict"]
-
 
 def main() -> int:
     wal = Path(tempfile.mkdtemp()) / "recovery10x.wal"
@@ -112,7 +87,6 @@ def main() -> int:
             wal.unlink()
         except OSError:
             pass
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

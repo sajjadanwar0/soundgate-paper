@@ -1,14 +1,3 @@
-"""Render the incident corpus from seeds.INCIDENTS.
-
-Writes:
-  results/incidents.jsonl  -- one JSON object per incident (machine-readable)
-  results/INCIDENTS.md     -- the human-readable evidence table
-
-The counts separate DIRECT rows (report exhibits a stop-primitive failure)
-from ADJACENT and CONTEXT rows, so the corpus cannot be read as inflating the
-direct evidence. Nothing here fabricates: fields that were not observed are
-rendered as blank / VERIFY exactly as stored in seeds.py.
-"""
 from __future__ import annotations
 
 import json

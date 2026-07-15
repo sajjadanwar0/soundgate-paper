@@ -1,37 +1,11 @@
-// SoundGate admission core -- mechanized safety proof (Verus).
-//
-// WHAT THIS IS. A faithful, verified abstract model of the admission logic in
-// ../../soundgate/src/lib.rs. Verus cannot reason about std::collections
-// internals, so we model the four state sets/maps with Verus-native Set/Map
-// and mirror submit/decide/cancel/close_run TRANSITION-BY-TRANSITION (each
-// arm is annotated with the lib.rs line it corresponds to). The proof then
-// discharges the four SoundGate safety properties as machine-checked theorems
-// that hold for EVERY reachable state and EVERY input.
-//
-// Verified with: Verus 0.2026.05.03 (rustc 1.95). Run:  verus gate_model.rs
-//
-// MAPPING TO lib.rs (audit this):
-//   released  : Set<(Run,Key)>   <-> Gate.released      (HashSet<EffectId>)
-//   rejected  : Set<(Run,Key)>   <-> Gate.rejected      (HashSet<EffectId>)
-//   pending   : Set<(Run,Key)>   <-> Gate.pending.keys() (HashMap key set)
-//   cancelled : Set<Run>         <-> Gate.cancelled     (HashSet<Run>)
-//   closed    : Set<Run>         <-> Gate.closed        (HashSet<Run>)
-// We model pending as a key-set (not a map to Effect) because none of the four
-// SAFETY properties depend on the held Effect payload -- only on whether an
-// identity is pending. (The payload matters only for what decide() returns,
-// not for the safety invariants.)
-
 use vstd::prelude::*;
 
 verus! {
 
-// Abstract, infinite domains. Using int keeps the proof general (no bound on
-// the number of runs/keys); the properties are proved for all of them.
 pub type Run = int;
 pub type Key = int;
 pub type Id = (Run, Key);
 
-// The admission verdicts (mirrors enum Admission in lib.rs).
 pub enum Verdict {
     Release,
     HeldForApproval,
@@ -84,7 +58,6 @@ impl Gate {
                     && !self.pending.contains(id))
     }
 
-    // ================= TRANSITIONS (mirror lib.rs) =================
 
     // submit(e). Mirrors lib.rs::submit. Returns (new_state, verdict).
     pub open spec fn submit(self, r: Run, k: Key, needs_approval: bool) -> (Gate, Verdict) {
@@ -143,9 +116,7 @@ impl Gate {
         }
     }
 
-    // cancel(r). Mirrors lib.rs::cancel: mark cancelled, drop this run's held
-    // effects. (Dropping only pending; released/rejected are per-identity and
-    // remain until close.)
+
     pub open spec fn cancel(self, r: Run) -> Gate {
         Gate {
             cancelled: self.cancelled.insert(r),
@@ -154,8 +125,7 @@ impl Gate {
         }
     }
 
-    // close_run(r). Mirrors lib.rs::close_run: fence + compact ALL per-identity
-    // state for r.
+
     pub open spec fn close_run(self, r: Run) -> Gate {
         Gate {
             closed: self.closed.insert(r),
@@ -167,7 +137,6 @@ impl Gate {
     }
 }
 
-// The empty initial gate satisfies the invariant.
 pub open spec fn init() -> Gate {
     Gate {
         released: Set::empty(),
@@ -184,18 +153,13 @@ proof fn init_inv()
     // empty sets: all three conjuncts hold vacuously.
 }
 
-// ================= INDUCTIVE PRESERVATION =================
-// Each transition preserves inv(). These are the workhorse lemmas.
 
 proof fn submit_preserves(g: Gate, r: Run, k: Key, na: bool)
     requires g.inv()
     ensures (#[trigger] g.submit(r, k, na)).0.inv()
 {
     let (g2, _v) = g.submit(r, k, na);
-    // Verus discharges each branch; the two state-changing branches insert an
-    // id that was NOT fenced, NOT released, NOT rejected, NOT pending, so all
-    // invariants are maintained. The set extensionality below helps the SMT
-    // solver connect insert with the foralls.
+
     assert(g2.inv()) by {
         reveal(Gate::inv);
     }
@@ -224,20 +188,13 @@ proof fn close_preserves(g: Gate, r: Run)
     requires g.inv()
     ensures (#[trigger] g.close_run(r)).inv()
 {
-    // close_run filters out every id of r from released/rejected/pending, so
-    // I3 holds for r; other runs are untouched.
+
     assert(g.close_run(r).inv()) by {
         reveal(Gate::inv);
     }
 }
 
-// ================= THE FOUR SAFETY PROPERTIES =================
-// Stated as theorems over any invariant-satisfying (i.e. reachable) state.
 
-// P4 / FENCE-ON-CANCEL: a submission from a fenced run NEVER releases. This is
-// the zombie-effect guarantee, including the zombie-after-close race: it holds
-// regardless of what per-identity state exists, because the fence is checked
-// first and (by I3) a closed run has no per-identity state anyway.
 proof fn p4_fence_blocks_release(g: Gate, r: Run, k: Key, na: bool)
     requires g.inv(), g.fenced(r)
     ensures (g.submit(r, k, na)).1 is RefusedCancelled
@@ -276,9 +233,6 @@ proof fn p2_rejected_stays(g: Gate, r: Run, k: Key, na: bool)
     // (rejected) fires -> RefusedRejected. (Or branch 1 if fenced.)
 }
 
-// P1 / HOLD-UNTIL-DECIDED: submitting a needs_approval effect for a fresh,
-// unfenced, undecided identity does NOT release -- it holds. Release requires
-// an explicit decide(approved=true).
 proof fn p1_gated_holds(g: Gate, r: Run, k: Key)
     requires
         g.inv(),

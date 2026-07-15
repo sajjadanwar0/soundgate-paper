@@ -1,41 +1,3 @@
-#!/usr/bin/env python3
-"""pause_sweep.py -- does approval-pause DURATION change the sibling leak?
-
-Reviewer request (R1): Experiment A runs at pause=0. A skeptic asks whether the
-measured leak is an artifact of the decision arriving instantly -- i.e. whether
-a realistic human pause (seconds) would let control return before the sibling
-effect lands. This harness answers it directly on the REAL FW-A (LangGraph)
-fan-out graph, sweeping the pause across {0, 0.1, 0.5, 1.0, 2.0} s.
-
-Why this is keyless. The sibling leak is a property of the framework's
-scheduling of a fixed plan shape, not of any model (paper Sec. 3). The graph
-fans out from START to an approval branch (which calls LangGraph's own
-interrupt()) and an effect branch (which performs the side effect) in the SAME
-superstep. The effect-branch node runs as part of the first invoke(), BEFORE
-any resume can occur -- so the effect either lands during that first superstep
-or it does not, and the wall-clock gap between invoke() returning (paused) and
-the human decision is irrelevant by construction. We measure `during_pause`
-(effects recorded at the instant invoke() returns, before sleeping) precisely
-to make that construction observable.
-
-For each pause value we run the graph two ways:
-  unmediated : the effect node appends to EFFECTS directly (native behavior)
-  mediated   : the effect node submits to a live SoundGate process and appends
-               only on `release` (the repair)
-and record whether the effect was present DURING the pause (before the sleep)
-and whether it was present AFTER the human rejected.
-
-Expected, and asserted:
-  unmediated  during_pause = True  for every pause value (leak is pause-invariant)
-  mediated    during_pause = False for every pause value (held at the gate)
-  mediated    after reject  = False (rejection yields zero effects)
-
-Usage:
-  cargo build --release && ./target/release/soundgate 127.0.0.1:8799 &
-  python3 e2e/pause_sweep.py --gate 127.0.0.1:8799 \
-      --pauses 0,0.1,0.5,1.0,2.0 --reps 20 | tee evidence/pause_sweep.txt
-"""
-
 import argparse
 import json
 import socket
@@ -43,7 +5,6 @@ import sys
 import time
 from typing import Annotated, TypedDict
 import operator
-
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import interrupt, Command
@@ -56,8 +17,6 @@ class St(TypedDict):
 
 
 class GateClient:
-    """Minimal line-delimited JSON client for the SoundGate server."""
-
     def __init__(self, host, port):
         self.host, self.port = host, port
 
@@ -85,12 +44,12 @@ def _build(effect_node, approval_node):
     g = StateGraph(St)
     g.add_node("approval", approval_node)
     g.add_node("effect", effect_node)
-    g.add_edge(START, "approval")   # parallel fan-out from START -- the leak shape
+    g.add_edge(START, "approval")
     g.add_edge(START, "effect")
     g.add_edge("approval", END)
     g.add_edge("effect", END)
-    return g.compile(checkpointer=InMemorySaver())
 
+    return g.compile(checkpointer=InMemorySaver())
 
 def run_unmediated(pause_s: float, tid: str):
     EFFECTS.clear()
@@ -107,10 +66,11 @@ def run_unmediated(pause_s: float, tid: str):
     cfg = {"configurable": {"thread_id": f"sweep-unmed-{tid}"}}
     first = g.invoke({"notes": []}, cfg)
     paused = bool(first.get("__interrupt__"))
-    during_pause = len(EFFECTS) > 0          # measured BEFORE the sleep
-    time.sleep(pause_s)                        # human decision latency
-    g.invoke(Command(resume="reject"), cfg)    # human rejects -- too late
+    during_pause = len(EFFECTS) > 0
+    time.sleep(pause_s)
+    g.invoke(Command(resume="reject"), cfg)
     after = len(EFFECTS) > 0
+
     return paused, during_pause, after
 
 
@@ -166,6 +126,7 @@ def main():
 
     failures = []
     rows = []
+
     for p in pauses:
         u_dur = u_aft = m_dur = m_aft = 0
         for i in range(args.reps):
@@ -195,6 +156,7 @@ def main():
     print("Reading: the unmediated leak count is INVARIANT to pause duration -- the")
     print("effect lands in the fan-out superstep before invoke() returns, so no human")
     print("reaction time closes it. Every mediated cell is zero at every pause.")
+
     if failures:
         print("\nFAILURES:")
         for f in failures[:40]:

@@ -1,17 +1,4 @@
 #!/usr/bin/env bash
-# e2e_structural_langgraph.sh -- STRUCTURAL MEDIATION x REAL FRAMEWORK.
-#
-# Closes the reviewer gap "the eBPF/namespace routes are demonstrated in
-# isolation but not integrated with any framework": run the ENTIRE
-# e2e_langgraph.py integration (all three repaired scenarios: sibling hold +
-# reject, replay dedup, cancel fence) INSIDE a loopback-only network
-# namespace, then prove from inside the SAME namespace that an unwrapped
-# tool's external action is refused by the kernel (ENETUNREACH), not by
-# discipline. One transcript, two facts:
-#   (1) the framework integration is unchanged and passes under structural
-#       confinement -- complete mediation imposed by the OS, and
-#   (2) the bypass path an unwrapped tool would take does not exist.
-#
 # Usage (repo root, gate built, probes venv present):
 #   cargo build --release
 #   sudo ./e2e_structural_langgraph.sh [venv-python] [gate-binary]

@@ -1,9 +1,3 @@
-"""FW-A (LangGraph) control-plane probes. Model-free, no API keys.
-
-Probes: sibling approval leak, reject-after-effect, replay double-execution,
-cancellation orphan (sync-in-thread) vs clean (pure async), and timeout zombie.
-Run: `uv run agentprobe-langgraph`
-"""
 from __future__ import annotations
 import asyncio
 import time
@@ -21,7 +15,6 @@ LOG = EventLog()
 
 class S(TypedDict, total=False):
     note: str
-
 
 def _parallel_gate_graph(gate_first: bool):
     def gate(state: S):
@@ -56,7 +49,8 @@ def probe_sibling_leak(gate_first: bool, label: str) -> ProbeResult:
     paused = "__interrupt__" in result
     effect_during_pause = LOG.contains("EFFECT:executed")
     trace = list(LOG.events)
-    g.invoke(Command(resume=False), cfg)  # human REJECTS
+    g.invoke(Command(resume=False), cfg)
+
     return ProbeResult(
         name=f"sibling_leak[{label}]",
         violation=paused and effect_during_pause,
@@ -64,7 +58,6 @@ def probe_sibling_leak(gate_first: bool, label: str) -> ProbeResult:
                 "effect_total_after_reject": LOG.count("EFFECT:executed"),
                 "trace_at_pause": trace},
     )
-
 
 def probe_replay() -> ProbeResult:
     LOG.clear()
@@ -85,12 +78,12 @@ def probe_replay() -> ProbeResult:
     at_pause = LOG.count("P2_EFFECT:executed")
     g.invoke(Command(resume=True), cfg)  # APPROVES
     after = LOG.count("P2_EFFECT:executed")
+
     return ProbeResult(
         name="replay_double_execution",
         violation=after > 1,
         detail={"effect_count_at_pause": at_pause, "effect_count_after_approve": after},
     )
-
 
 def probe_cancellation(sync_in_thread: bool, label: str) -> ProbeResult:
     LOG.clear()
@@ -119,6 +112,7 @@ def probe_cancellation(sync_in_thread: bool, label: str) -> ProbeResult:
 
     async def scenario():
         task = asyncio.create_task(g.ainvoke({"note": ""}, cfg))
+
         await asyncio.sleep(0.15)
         task.cancel()
         seen = False
@@ -127,11 +121,14 @@ def probe_cancellation(sync_in_thread: bool, label: str) -> ProbeResult:
         except asyncio.CancelledError:
             seen = True
         at = LOG.contains("EFFECT")
+
         await asyncio.sleep(0.8)
         after = LOG.contains("EFFECT")
+
         return seen, at, after
 
     seen, at, after = asyncio.run(scenario())
+
     return ProbeResult(
         name=f"cancellation[{label}]",
         violation=seen and (not at) and after,
@@ -171,6 +168,7 @@ def probe_timeout_zombie() -> ProbeResult:
         return timed_out, at, after
 
     timed_out, at, after = asyncio.run(scenario())
+
     return ProbeResult(
         name="timeout_zombie",
         violation=timed_out and (not at) and after,

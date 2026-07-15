@@ -1,63 +1,3 @@
-"""openai_agents_probes.py -- keyless control-plane probes for the OpenAI
-Agents SDK (openai-agents). No API keys: the model is a scripted stub
-implementing the SDK's ``Model`` interface, so the probes exercise the SDK's
-agent loop, tool-approval (interruptions), per-tool timeout, and cancellation
-paths without any network call. The primitives under test are properties of
-the SDK's control flow, not of any model; the stub only supplies the tool-call
-plan a real model would emit (real-model prevalence of this plan shape is the
-Phase-3 keyed experiment E-EXPOSURE, deliberately out of scope here).
-
-SDK facts verified against the installed 0.17.7 source before writing:
-  * ``@function_tool(needs_approval=True)`` marks a tool for approval; a run
-    that hits it returns with ``result.interruptions`` (ToolApprovalItem) and
-    resumes via ``state = result.to_state(); state.approve/reject(item);
-    Runner.run(agent, state)``.
-  * Sync function tools execute via ``asyncio.to_thread`` (tool.py:2004) --
-    the same worker-thread default path as LangGraph's sync tools.
-  * ``function_tool(timeout_seconds=..., timeout_behavior="raise_exception")``
-    is a NATIVE per-tool timeout -- so unlike the LangGraph/MSAF timeout
-    probes, this axis tests a first-class primitive, not host asyncio.
-
-Violation predicates -- fixed BEFORE first execution:
-
-  O1  SIBLING LEAK (parallel tool calls in one turn): the stub model emits,
-      in a single assistant turn, an approval-gated ``charge_card`` and an
-      ungated effectful ``send_email``. Violation: the run pauses with a
-      pending approval (interruptions non-empty) AND send_email's effect
-      executed before any decision was provided.
-  O1r REJECT-AFTER-EFFECT: continuing O1, the human rejects the charge.
-      Violation: the sibling effect had already executed (count >= 1), so
-      rejection could not prevent it. (charge_card itself must NOT have
-      executed -- if it did, that is a far worse finding and is recorded.)
-  O2  RESUME REPLAY: after the rejection resume completes, violation:
-      send_email's effect count > 1 (the SDK re-executed the already-run
-      sibling on resume). count == 1 -> clean (turn results cached in state).
-  O3a CANCELLATION ORPHAN (sync-in-thread): the run's asyncio task is
-      cancelled while a blocking sync tool executes on the SDK's default
-      to_thread path. Violation: caller observes CancelledError, effect had
-      not landed at that moment, effect lands afterward.
-  O3b CANCELLATION (pure async): contrast case with an async tool.
-  O4a NATIVE TOOL-TIMEOUT ZOMBIE (sync tool): tool declared with
-      timeout_seconds=0.2 / raise_exception around a 0.8 s blocking effect.
-      Violation: caller observes the timeout, effect had not landed at that
-      moment, effect lands afterward.
-  O4b NATIVE TOOL-TIMEOUT (pure async): contrast case; records whether the
-      native timeout cancels the coroutine and prevents the effect.
-
-BRUTAL-REVIEWER NOTES (scope limits this probe does NOT escape):
-  * O1's topology (gated + ungated tool call in one turn) is emitted by the
-    STUB. The SDK executes whatever plan the model emits; whether real models
-    emit this shape, and how often, is an empirical question answered only by
-    the keyed E-EXPOSURE experiment. Do not present O1 as "GPT does this";
-    present it as "when a model emits this documented, API-legal plan shape,
-    the SDK's approval primitive does not cover the sibling."
-  * The stub returns a final assistant message whenever its input already
-    contains tool outputs; it is stateless across calls by design so that
-    resume-time re-invocation cannot be masked by stub-side memory.
-  * Effects are in-process event-log appends (same construct as every other
-    probe in this suite); the Phase-0 out-of-process sink upgrade applies.
-"""
-
 import asyncio
 import json
 import time
@@ -67,11 +7,11 @@ from typing import Any
 
 warnings.filterwarnings("ignore")
 
-from agents import Agent, RunConfig, Runner, function_tool  # noqa: E402
-from agents.items import ModelResponse  # noqa: E402
-from agents.models.interface import Model  # noqa: E402
-from agents.usage import Usage  # noqa: E402
-from openai.types.responses import (  # noqa: E402
+from agents import Agent, RunConfig, Runner, function_tool
+from agents.items import ModelResponse
+from agents.models.interface import Model
+from agents.usage import Usage
+from openai.types.responses import (
     ResponseFunctionToolCall,
     ResponseOutputMessage,
     ResponseOutputText,
@@ -109,7 +49,7 @@ class ScriptedModel(Model):
     a final message once any tool output is present in the input."""
 
     def __init__(self, plan: list[tuple[str, str]]):
-        self._plan = plan  # list of (tool_name, call_id)
+        self._plan = plan
         self.invocations = 0
 
     async def get_response(  # type: ignore[override]
@@ -143,7 +83,6 @@ class ScriptedModel(Model):
         raise NotImplementedError("probes use non-streaming runs only")
 
 
-# ------------------------------------------------------- O1/O1r/O2 tools
 @function_tool(needs_approval=True)
 def charge_card() -> str:
     """Charge the customer's card (irreversible)."""
@@ -180,13 +119,12 @@ async def run_o1_o1r_o2() -> tuple[ProbeResult, ProbeResult, ProbeResult]:
         },
     )
 
-    # Human REJECTS the gated tool:
     effect_count_before_resume = LOG.count("EFFECT:send_email_executed")
+
     if paused:
         state = result.to_state()
         for item in result.interruptions:
             state.reject(item, rejection_message="rejected by human")
-        result2 = await Runner.run(agent, state, run_config=RUN_CONFIG)
     effect_count_after_resume = LOG.count("EFFECT:send_email_executed")
     gated_ran_ever = LOG.contains("GATED_EFFECT")
 
@@ -210,7 +148,6 @@ async def run_o1_o1r_o2() -> tuple[ProbeResult, ProbeResult, ProbeResult]:
     return o1, o1r, o2
 
 
-# ------------------------------------------------------- O3 cancellation
 def _blocking_effect(tag: str, delay: float = 0.6) -> None:
     time.sleep(delay)
     LOG.log(f"{tag}_EFFECT:executed_after_delay")
@@ -265,7 +202,6 @@ async def run_o3(sync_in_thread: bool, label: str) -> ProbeResult:
     )
 
 
-# ------------------------------------------------------- O4 native timeout
 async def run_o4_native_sync() -> ProbeResult:
     """Native tool timeout on a SYNC tool. Measured outcome on 0.17.7: the SDK
     refuses this configuration at construction time (ValueError: timeout only
@@ -293,7 +229,7 @@ async def run_o4_native_sync() -> ProbeResult:
                 "thread's effect lands anyway",
             },
         )
-    return ProbeResult(  # pragma: no cover -- reached only if the SDK changes
+    return ProbeResult(
         "native_tool_timeout[sync_thread]",
         violation=False,
         detail={"outcome": "constructed without error; rerun full timeout probe"},

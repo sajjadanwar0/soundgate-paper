@@ -1,14 +1,4 @@
-//! SOUNDGATE replicated network — openraft 0.8.4 RPC over HTTP (reqwest).
-//!
-//! Each node exposes three POST endpoints for peer RPC:
-//!   POST {node}/raft/append-entries
-//!   POST {node}/raft/vote
-//!   POST {node}/raft/install-snapshot
-//! served by the axum router in `bin/soundgate_raft.rs`. This factory is the
-//! client side that the local Raft uses to reach peers.
-
 use std::sync::Arc;
-
 use async_trait::async_trait;
 use openraft::{
     BasicNode,
@@ -21,7 +11,6 @@ use openraft::{
 };
 use reqwest::Client;
 use serde::{Serialize, de::DeserializeOwned};
-
 use super::SoundGateTypeConfig;
 
 pub struct SoundGateNetworkFactory {

@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-"""Recompute pooled Experiment-A figures from all results/expA_*.jsonl files."""
 import json, glob, collections
 tot, per = collections.Counter(), {}
+
 for f in sorted(glob.glob("results/expA_*.jsonl")):
     c = collections.Counter()
     for line in open(f):
@@ -16,6 +15,7 @@ for f in sorted(glob.glob("results/expA_*.jsonl")):
         c["leak_med"]   += int(r.get("leaked_mediated") is True)
     per[f] = c
     for k, v in c.items(): tot[k] += v
+
 for f, c in per.items():
     print(f"  {f.split('/')[-1]:<40} runs={c['runs']:>4} emit={c['emitted']:>4} "
           f"leak_unmed={c['leak_unmed']:>4} leak_med={c['leak_med']:>3}")

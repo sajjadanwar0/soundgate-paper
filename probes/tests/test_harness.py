@@ -1,7 +1,6 @@
 """Unit tests for the shared harness (model-free, no framework needed)."""
 from agentprobe._harness import EventLog, ProbeResult, summarize
 
-
 def test_eventlog_counts():
     log = EventLog()
     log.log("a"); log.log("a"); log.log("b")
@@ -9,7 +8,6 @@ def test_eventlog_counts():
     assert log.contains("b")
     log.clear()
     assert log.events == []
-
 
 def test_summarize_counts_violations():
     rs = [

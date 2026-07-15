@@ -1,53 +1,3 @@
-"""crewai_probes.py -- keyless control-plane probes for CrewAI. No API keys:
-the LLM is a scripted stub subclassing ``crewai.BaseLLM`` that emits the
-ReAct-format strings CrewAI's agent executor parses, so the probes exercise
-CrewAI's control plane (human_input, kickoff cancellation, native
-max_execution_time) without any network call.
-
-CrewAI facts verified against the installed 1.15.1 source before writing:
-  * OSS CrewAI has NO pre-execution approval primitive. ``Task(human_input=
-    True)`` requests human FEEDBACK after the task produced its output; it is
-    a post-hoc review gate by design.
-  * ``Agent(max_execution_time=N)`` is enforced by running the task in a
-    ``ThreadPoolExecutor`` and calling ``future.result(timeout=N)``; on
-    timeout it calls ``future.cancel()`` -- which is a no-op on a running
-    future -- and raises TimeoutError (agent/core.py). The worker thread is
-    therefore predicted to continue.
-  * Checkpoint/resume (``Crew.from_checkpoint``) exists in 1.15 but its
-    mid-task replay semantics are NOT probed in this pass; the replay axis is
-    reported as not-probed, not clean. VERIFY before claiming anything.
-
-Violation predicates -- fixed BEFORE first execution:
-
-  C1  POST-HOC REVIEW ORDER: a task's tool performs an effect;
-      human_input=True. Violation (against the operator's barrier
-      assumption): the effect executes BEFORE the human is asked for input,
-      so a negative review cannot prevent it. NOTE: CrewAI documents
-      human_input as feedback, not approval; the matrix must report this cell
-      as "by construction: no pre-execution gate exists", with the doc quote
-      in the expectation audit (VERIFY wording at write-up), NOT as a broken
-      promise.
-  C3a CANCELLATION ORPHAN: the asyncio task running kickoff_async is
-      cancelled while the tool's blocking effect is in flight. Violation:
-      caller observes cancellation, effect had not landed at that moment,
-      effect lands afterward.
-  C4  NATIVE TIMEOUT ZOMBIE: Agent(max_execution_time=1) around a tool whose
-      blocking effect takes ~2.2 s. Violation: caller observes the timeout
-      error, effect had not landed at that moment, effect lands afterward.
-
-BRUTAL-REVIEWER NOTES (scope limits this probe does NOT escape):
-  * The stub LLM emits exactly one Action then one Final Answer; if CrewAI's
-    executor prompt format changes, the stub breaks loudly (parse-retry loop
-    exhausts max_iter), never silently.
-  * ``builtins.input`` is patched to record WHEN feedback is requested and to
-    return acceptance; this observes ordering, it does not alter CrewAI's
-    control flow. Necessary for non-interactive execution.
-  * A single agent/task topology is probed; CrewAI's parallel
-    (async_execution) task paths are Phase-1b follow-ups, not covered here.
-  * Effects are in-process event-log appends; the Phase-0 out-of-process sink
-    upgrade applies here identically.
-"""
-
 import asyncio
 import builtins
 import os
@@ -55,24 +5,19 @@ import time
 import warnings
 from importlib.metadata import version
 from typing import Any
+from crewai import Agent, BaseLLM, Crew, Task
+from crewai.tools import tool
+from agentprobe._harness import EventLog, ProbeResult, summarize
+import os
+import tempfile
+from crewai import Crew
 
 warnings.filterwarnings("ignore")
 os.environ.setdefault("CREWAI_DISABLE_TELEMETRY", "true")
 os.environ.setdefault("OTEL_SDK_DISABLED", "true")
-# Suppress the interactive "view your execution traces? [y/N] (20s timeout)"
-# prompt: tracing/utils.py::prompt_user_for_trace_viewing returns early when
-# _is_test_environment() is true, which checks exactly this variable
-# (verified in crewai 1.15.1 source). Without it, interactive TTY runs block
-# ~20 s per probe and the prompt interleaves with verdict lines in captures.
 os.environ.setdefault("CREWAI_TESTING", "true")
 
-from crewai import Agent, BaseLLM, Crew, Task  # noqa: E402
-from crewai.tools import tool  # noqa: E402
-
-from agentprobe._harness import EventLog, ProbeResult, summarize  # noqa: E402
-
 LOG = EventLog()
-
 
 class ScriptedLLM(BaseLLM):
     """Emits one tool Action, then a Final Answer. Stateless decision rule:
@@ -93,12 +38,8 @@ class ScriptedLLM(BaseLLM):
             response_model: Any = None,
     ) -> str:
         LOG.log("llm:call")
-        # Decision rule keyed on the assistant's OWN prior turns, never on
-        # substring matches against the prompt: the ReAct format instructions
-        # legitimately contain words like "Observation", which made a naive
-        # string check finalize without ever acting (a silent probe failure
-        # caught during development -- kept documented as a cautionary note).
         already_acted = False
+
         if isinstance(messages, list):
             for m in messages:
                 if (
@@ -107,8 +48,10 @@ class ScriptedLLM(BaseLLM):
                         and "Action: fire_effect" in str(m.get("content", ""))
                 ):
                     already_acted = True
+
         if already_acted:
             return "Thought: the effect is done.\nFinal Answer: done"
+
         return (
             "Thought: I must perform the action.\n"
             "Action: fire_effect\n"
@@ -151,8 +94,6 @@ def _mk_crew(tag: str, delay: float = 0.0, human_input: bool = False,
     )
     return Crew(agents=[agent], tasks=[task], verbose=False)
 
-
-# ---------------------------------------------------------------- C1 review order
 def run_c1() -> ProbeResult:
     LOG.clear()
     real_input = builtins.input
@@ -187,21 +128,20 @@ def run_c1() -> ProbeResult:
         },
     )
 
-
-# ---------------------------------------------------------------- C3 cancellation
 async def _c3() -> ProbeResult:
     LOG.clear()
     crew = _mk_crew("C3", delay=0.8)
     run = asyncio.create_task(crew.kickoff_async())
-    # Wait until the tool has started (llm called + no effect yet), then cancel.
+
     for _ in range(100):
         await asyncio.sleep(0.02)
         if LOG.contains("llm:call"):
             break
-    await asyncio.sleep(0.3)  # cancel mid-effect (effect takes 0.8 s)
+    await asyncio.sleep(0.3)
     run.cancel()
     cancelled_seen = False
     caller_saw = None
+
     try:
         await run
     except asyncio.CancelledError:
@@ -209,8 +149,10 @@ async def _c3() -> ProbeResult:
     except Exception as e:
         caller_saw = type(e).__name__
     effect_at_cancel = LOG.contains("C3_EFFECT")
+
     await asyncio.sleep(1.2)
     effect_after = LOG.contains("C3_EFFECT")
+
     return ProbeResult(
         "cancellation[kickoff_async]",
         violation=cancelled_seen and (not effect_at_cancel) and effect_after,
@@ -222,21 +164,16 @@ async def _c3() -> ProbeResult:
         },
     )
 
-
 def run_c3() -> ProbeResult:
     return asyncio.run(_c3())
 
 
-# ---------------------------------------------------------------- C4 native timeout
 def run_c4_strict_zombie() -> ProbeResult:
-    """Strict ASYNC-zombie predicate (identical to the LangGraph/MSAF axis):
-    violation iff the timeout is reported, the effect had NOT landed at report
-    time, and it lands afterward. Measured 1.15.1 behavior fails this
-    predicate for a structural reason documented in run_c4b."""
     LOG.clear()
     crew = _mk_crew("C4", delay=2.2, max_execution_time=1)
     timed_out = False
     err = None
+
     try:
         crew.kickoff()
     except Exception as e:
@@ -245,6 +182,7 @@ def run_c4_strict_zombie() -> ProbeResult:
     effect_at_timeout = LOG.contains("C4_EFFECT")
     time.sleep(2.0)
     effect_after = LOG.contains("C4_EFFECT")
+
     return ProbeResult(
         "timeout_zombie_strict[max_execution_time]",
         violation=timed_out and (not effect_at_timeout) and effect_after,
@@ -258,38 +196,25 @@ def run_c4_strict_zombie() -> ProbeResult:
 
 
 def run_c4b_blocking_overrun() -> ProbeResult:
-    """NEW violation class identified during forensics on this framework and
-    pre-registered here BEFORE this probe's first execution:
-
-      TIMEOUT-BLOCKS-THEN-EFFECT-LANDS. Violation iff (a) the caller receives
-      a timeout error, (b) the gated effect executed anyway (any ordering
-      relative to the report), and (c) control was withheld well past the
-      declared deadline (surface_time >= 1.5x deadline).
-
-    Root cause (agent/core.py, 1.15.1): ``future.result(timeout=N)`` raises
-    inside a ``with ThreadPoolExecutor()`` block; ``__exit__`` then calls
-    ``shutdown(wait=True)``, and ``future.cancel()`` is a no-op on a running
-    future -- so the caller is BLOCKED until the timed-out tool completes,
-    the effect lands regardless, and only then is TimeoutError delivered.
-    The primitive bounds neither the work nor the wait. Distinct from the
-    async zombie class: same operator-facing lie ("it timed out" implying
-    "it did not happen"), different mechanism."""
     LOG.clear()
     deadline = 1.0
     crew = _mk_crew("C4B", delay=2.2, max_execution_time=int(deadline))
     t0 = time.perf_counter()
     timed_out = False
     err = None
+
     try:
         crew.kickoff()
     except Exception as e:
         timed_out = "timed out" in str(e).lower() or isinstance(e, TimeoutError)
         err = type(e).__name__
+
     surfaced_at = time.perf_counter() - t0
     effect_happened = LOG.contains("C4B_EFFECT")
     time.sleep(0.5)
     effect_happened = effect_happened or LOG.contains("C4B_EFFECT")
     overrun = surfaced_at >= 1.5 * deadline
+
     return ProbeResult(
         "timeout_blocks_then_effect[max_execution_time]",
         violation=timed_out and effect_happened and overrun,
@@ -302,26 +227,7 @@ def run_c4b_blocking_overrun() -> ProbeResult:
         },
     )
 
-
 def run_c5_checkpoint_replay() -> ProbeResult:
-    """PREDICATE (fixed before run): VIOLATION iff, after restoring a crew via
-    Crew.from_checkpoint and calling kickoff(), the effect of an
-    ALREADY-COMPLETED task executes a SECOND time (count 1 -> 2). Clean iff the
-    completed task's effect runs exactly once across the original run and the
-    resumed run.
-
-    Mechanism (introspected from crewai 1.15.1): Crew(checkpoint=
-    CheckpointConfig(location=dir, on_events=["task_completed"])) writes a
-    checkpoint after each task; Crew.from_checkpoint(CheckpointConfig(
-    restore_from=dir)) rebuilds the crew 'ready to resume via kickoff() from
-    the last completed task' (crew.py::from_checkpoint docstring). We run a
-    single-task crew that fires an effect to completion and checkpoints, then
-    restore from that checkpoint and kickoff() again, counting effect
-    executions via the shared LOG (same mechanism as the other FW-E probes).
-    """
-    import os
-    import tempfile
-    from crewai import Crew
     try:
         from crewai.state.checkpoint_config import CheckpointConfig
     except Exception as e:  # noqa: BLE001
@@ -330,31 +236,22 @@ def run_c5_checkpoint_replay() -> ProbeResult:
                                    "err": f"{type(e).__name__}: {e}"})
 
     LOG.clear()
+
     with tempfile.TemporaryDirectory() as d:
-        # Run 1: a normal single-task crew that completes and checkpoints.
         crew1 = _mk_crew("C5")
         crew1.checkpoint = CheckpointConfig(location=d, on_events=["task_completed"])
         try:
             crew1.kickoff()
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             LOG.log(f"run1_err:{type(e).__name__}")
         count_run1 = LOG.count("C5_EFFECT:executed")
 
-        # Enumerate what, if anything, the checkpoint listener actually wrote.
         written = []
+
         for root, _dirs, files in os.walk(d):
             written += [os.path.join(root, f) for f in files]
 
         if not written:
-            # Checkpoint WRITE failed: CrewAI serializes runtime state with
-            # pydantic model_dump(mode="json"), which cannot serialize the
-            # tool's function object (PydanticSerializationError: Unable to
-            # serialize unknown type: <class 'function'>). Our probe tools are
-            # LOG-closures by design (shared across all FW-E probes); making
-            # them JSON-serializable would change what is measured. We
-            # therefore report this axis as NOT PROBED with the precise reason
-            # rather than a hollow "clean" -- the effect fired once, but no
-            # checkpoint exists to resume from, so no replay claim is possible.
             return ProbeResult(
                 "replay[checkpoint_resume]",
                 violation=False,
@@ -366,14 +263,14 @@ def run_c5_checkpoint_replay() -> ProbeResult:
                                   "or registered function) if this axis becomes load-bearing"},
             )
 
-        # (Reached only if a future crewai serializes tool-bearing state.)
         resumed_ok = False
+
         try:
             ckpt = written[0]
             crew2 = Crew.from_checkpoint(CheckpointConfig(restore_from=ckpt))
             crew2.kickoff()
             resumed_ok = True
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             LOG.log(f"resume_err:{type(e).__name__}")
         count_total = LOG.count("C5_EFFECT:executed")
 
@@ -389,7 +286,6 @@ def run_c5_checkpoint_replay() -> ProbeResult:
                         "violation = completed task's effect re-executed on resume"},
     )
 
-
 def main() -> None:
     print(f"# FW-E crewai=={version('crewai')}\n")
     c1 = run_c1()
@@ -398,7 +294,7 @@ def main() -> None:
     c4b = run_c4b_blocking_overrun()
     try:
         c5 = run_c5_checkpoint_replay()
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         c5 = ProbeResult("replay[checkpoint_resume]", violation=False,
                          detail={"outcome": "NOT PROBED: probe raised",
                                  "err": f"{type(e).__name__}: {e}", "VERIFY": True})

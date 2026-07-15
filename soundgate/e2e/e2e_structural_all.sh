@@ -1,19 +1,4 @@
 #!/usr/bin/env bash
-# e2e_structural_all.sh -- B1: run EVERY framework repair inside a loopback-only
-# network namespace, gate as sole reachable endpoint, proving complete mediation
-# is STRUCTURALLY enforced (kernel-imposed) across the whole evaluation.
-#
-# Per framework, in a fresh net namespace:
-#   (1) BYPASS PROBE: an unwrapped external connect must fail (no route out).
-#   (2) FULL INTEGRATION: the keyless repair harness runs; the gate it spawns
-#       inherits the namespace, so gate+framework+wrapper+tools sit behind one
-#       egress wall; loopback (framework->gate) is the only link.
-#
-# v2: the bypass probe is a bash /dev/tcp check inside a single-quoted heredoc,
-# so nothing passes through nested shell quoting (v1's multi-line Python string
-# was mangled by the quoting and SyntaxError'd). PY/HARNESS are passed as
-# positional args to `bash -s`, not interpolated.
-#
 # Usage (from soundgate/):  ./e2e/e2e_structural_all.sh | tee evidence/e2e_structural_all.txt
 set -uo pipefail
 cd "$(dirname "$0")/.."          # -> soundgate/

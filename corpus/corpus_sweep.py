@@ -1,14 +1,4 @@
-"""corpus_sweep.py -- keyword sweep of ALL SIX framework trackers.
-
-Answers the reviewer objection that the incident corpus is single-tracker by
-construction: the same axis-derived keyword families are searched against
-every measured framework's public issue tracker, unauthenticated, via the
-GitHub search API (10 requests/min budget honored with pacing). Results are
-CANDIDATES ONLY: the corpus's conservative protocol requires reading each
-issue before classifying it DIRECT/ADJACENT/CONTEXT, so this tool emits a
-screening list (JSONL + per-repo counts) for manual verification -- it never
-writes classifications.
-
+"""
 Usage:
   python3 corpus_sweep.py --chunk 1   # first half of the query matrix
   python3 corpus_sweep.py --chunk 2   # second half
@@ -33,8 +23,6 @@ REPOS = [
     "crewAIInc/crewAI",
 ]
 
-# Axis-derived keyword families (A1 sibling/parallel-interrupt, A2 replay,
-# A3 cancellation, A4 timeout). Plain words; GitHub ANDs terms.
 QUERIES = [
     ("A1", "interrupt parallel"),
     ("A1", "human approval parallel"),
@@ -47,7 +35,7 @@ QUERIES = [
 OUT = Path(__file__).resolve().parent / "results"
 OUT.mkdir(exist_ok=True)
 RESULTS = OUT / "sweep_results.jsonl"
-PACE_S = 6.3  # 10 search req/min unauthenticated
+PACE_S = 6.3
 
 
 def search(repo: str, words: str):
@@ -78,7 +66,7 @@ def run_chunk(chunk: int) -> None:
                 data = search(repo, words)
                 items = data.get("items", [])
                 total = data.get("total_count", 0)
-            except Exception as e:  # rate limit / transient: record and move on
+            except Exception as e:
                 print(f"{repo:<34} [{axis}] '{words}': ERROR {e}")
                 time.sleep(PACE_S)
                 continue

@@ -1,37 +1,3 @@
-"""E-E2E-C: soundgate wired into a REAL Microsoft Agent Framework workflow
-(keyless).
-
-FW-A (e2e_langgraph.py) repairs a Pregel/superstep runtime; FW-B
-(e2e_llamaindex.py) repairs an event-driven runtime; this repairs FW-C's
-message-passing fan-out runtime (agent-framework-core 1.10.0) -- the third
-independently designed execution model -- through the same ~20-line wrapper.
-
-Scenarios mirror FW-C's measured violation axes (probe transcript:
-probes/results/msaf.txt):
-  A. SIBLING LEAK + REJECT-AFTER-EFFECT REPAIRED: fan-out edges route to a
-     request_info gate executor and a sibling effect executor; the sibling's
-     effect is mediated -> HELD while the run idles with a pending request;
-     the human rejects -> ZERO effects executed. (Unmediated, the probe shows
-     the sibling effect firing before the human response.)
-  C. CANCELLATION ZOMBIE FENCED: an executor runs a blocking tool via
-     asyncio.to_thread; the run's task is cancelled mid-tool (the probe shows
-     the effect landing afterward); the operator's cancel also fences the run
-     at the gate, so the zombie's later submission is refused_cancelled ->
-     zero post-cancel effects.
-  D. HOST-TIMEOUT ZOMBIE FENCED: no native run timeout exists in 1.10.0
-     (probe A4: host-level deadline, zombie lands after the timeout is
-     reported); here the same host deadline fires, the operator's stop fences
-     the run, and the in-flight tool's late submission is refused ->
-     zero post-timeout effects.
-Replay is not demonstrated because FW-C is natively CLEAN on that axis
-(turn results cached in the resume token; probe replay 1->1, also across a
-checkpoint restore) -- there is nothing to repair.
-
-Run (uses the probes venv for agent-framework-core==1.10.0; gate built):
-  cd soundgate && cargo build --release
-  ../probes/.venv/bin/python e2e/e2e_msaf.py
-"""
-
 import asyncio
 import json
 import socket
@@ -44,17 +10,13 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
-import agent_framework as af  # noqa: E402
-from agent_framework import WorkflowContext  # noqa: E402
+import agent_framework as af
+from agent_framework import WorkflowContext
 
 ADDR = ("127.0.0.1", 8808)
 BIN = Path(__file__).resolve().parents[1] / "target" / "release" / "soundgate"
 
-
-# ---------------------------------------------------------------- gate shim
 class GateClient:
-    """~20-line mediation wrapper: submit; perform the effect ONLY on release."""
-
     def __init__(self, addr=ADDR):
         self.sock = socket.create_connection(addr, timeout=5.0)
         self.rf = self.sock.makefile("r")
@@ -81,19 +43,15 @@ class GateClient:
         return self._call({"op": "cancel", "run_id": run_id})
 
 
-EFFECTS = []          # the world: what actually executed
-gate = None   # set in main()
-SIBLING_VERDICT = []  # verdict seen by the sibling executor
-
+EFFECTS = []
+gate = None
+SIBLING_VERDICT = []
 
 @dataclass
 class ApprovalRequest:
     question: str = "approve the plan?"
 
-
 class GateExecutor(af.Executor):
-    """Approval gate: requests human info (same shape as the probe)."""
-
     @af.handler
     async def start(self, msg: str, ctx: WorkflowContext) -> None:
         await ctx.request_info(ApprovalRequest(), str)
@@ -104,8 +62,6 @@ class GateExecutor(af.Executor):
     ) -> None:
         pass
 
-
-# ------------------------------------------------- Scenario A: sibling leak
 async def scenario_a() -> bool:
     EFFECTS.clear()
     SIBLING_VERDICT.clear()
@@ -132,9 +88,9 @@ async def scenario_a() -> bool:
     result = await wf.run("go")
     paused = result.get_final_state() == af.WorkflowRunState.IDLE_WITH_PENDING_REQUESTS
     effects_during_pause = len(EFFECTS)
-    # HUMAN REJECTS: gate refuses the held effect forever; the run resumes.
     d = gate.decide("runA", "send_email", approved=False)
     requests = result.get_request_info_events()
+
     if requests:
         await wf.run(responses={requests[0].request_id: "no"})
     ok = (paused
@@ -147,15 +103,15 @@ async def scenario_a() -> bool:
           f"effects_during_pause={effects_during_pause} reject={d} "
           f"effects_total={len(EFFECTS)} "
           f"-> {'HELD+REFUSED (repaired)' if ok else 'LEAK'}")
+
     return ok
 
 
-# -------------------------------------------- Scenario C: cancellation zombie
 async def scenario_c() -> bool:
     EFFECTS.clear()
 
     def blocking_tool() -> None:
-        time.sleep(0.8)  # outlives the cancellation below
+        time.sleep(0.8)
         gate.mediated_effect("runC", "post_webhook",
                              lambda: EFFECTS.append("post_webhook"),
                              needs_approval=False)
@@ -166,31 +122,34 @@ async def scenario_c() -> bool:
 
     wf = af.WorkflowBuilder(start_executor=worker).build()
     task = asyncio.create_task(wf.run("go"))
+
     await asyncio.sleep(0.2)
-    gate.cancel("runC")            # the operator's stop fences the run...
-    task.cancel()                  # ...alongside the host-level cancel
+
+    gate.cancel("runC")
+    task.cancel()
     cancelled_seen = False
+
     try:
         await task
     except asyncio.CancelledError:
         cancelled_seen = True
     except Exception:
         pass
-    await asyncio.sleep(1.2)       # zombie thread wakes, submits, is fenced
+    await asyncio.sleep(1.2)
     ok = cancelled_seen and len([e for e in EFFECTS if e == "post_webhook"]) == 0
+
     print(f"C zombie fenced           : cancelled_seen={cancelled_seen} "
           f"zombie_effect_executed={len(EFFECTS) != 0} "
           f"effects_total={len(EFFECTS)} "
           f"-> {'FENCED (repaired)' if ok else 'ORPHANED'}")
+
     return ok
 
-
-# ---------------------------------------- Scenario D: host-timeout zombie
 async def scenario_d() -> bool:
     EFFECTS.clear()
 
     def blocking_tool() -> None:
-        time.sleep(0.8)  # outlives the deadline below
+        time.sleep(0.8)
         gate.mediated_effect("runT", "issue_refund",
                              lambda: EFFECTS.append("issue_refund"),
                              needs_approval=False)
@@ -201,19 +160,23 @@ async def scenario_d() -> bool:
 
     wf = af.WorkflowBuilder(start_executor=worker).build()
     timed_out = False
+
     try:
         await asyncio.wait_for(wf.run("go"), timeout=0.25)
     except asyncio.TimeoutError:
         timed_out = True
-        gate.cancel("runT")        # the observed stop fences the run
-    await asyncio.sleep(1.2)       # zombie wakes, submits, is fenced
+        gate.cancel("runT")
+
+    await asyncio.sleep(1.2)
+
     ok = timed_out and len([e for e in EFFECTS if e == "issue_refund"]) == 0
+
     print(f"D timeout zombie fenced   : caller_saw_timeout={timed_out} "
           f"zombie_effect_executed={len(EFFECTS) != 0} "
           f"effects_total={len(EFFECTS)} "
           f"-> {'FENCED (repaired)' if ok else 'ZOMBIE'}")
-    return ok
 
+    return ok
 
 async def main():
     global gate
@@ -231,7 +194,6 @@ async def main():
         return 0 if n == 3 else 1
     finally:
         srv.terminate()
-
 
 if __name__ == "__main__":
     raise SystemExit(asyncio.run(main()))

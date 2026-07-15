@@ -1,13 +1,6 @@
-"""Validate the LangGraph mediation helpers against the mock gate (no LangGraph,
-no LLM, no Rust needed). Proves submit->held->decide->release->perform, replay
-dedup, rejection, and the sibling-leak repair."""
-import json, socket, threading, hashlib, hmac as _hmac
-from soundgate_client import GateClient
-from soundgate_langgraph import mediate_no_approval, mediate_with_approval
-
-# --- reuse the property-correct mock gate core + protocol ------------------
 class Core:
     def __init__(s): s.released=set();s.cancelled=set();s.pending={};s.rejected=set();s.closed=set()
+
     def submit(s,r,k,n):
         if r in s.cancelled or r in s.closed: return "refused_cancelled"
         i=(r,k)
@@ -16,6 +9,7 @@ class Core:
         if i in s.pending:  return "held_for_approval"
         if n: s.pending[i]=1; return "held_for_approval"
         s.released.add(i); return "release"
+
     def decide(s,r,k,a):
         i=(r,k)
         if i not in s.pending:
@@ -68,16 +62,13 @@ va=g.submit(r2,"branchA_email",True)                       # A: held (paused for
 print(" A submit ->", va); assert va=="held_for_approval"
 sib=mediate_no_approval(g,r2,"branchB_charge",lambda:(log.append("SIBLING CHARGE"),"ok")[1])  # B during pause
 print(" B (sibling) ->", sib)
-# In the unmediated framework B would execute here. Mediated, B released only if
-# the gate allows; a needs_approval=False sibling releases UNLESS the run is
-# fenced. To hold siblings during a pause, cancel/close the run on reject:
-gA=g.decide(r2,"branchA_email",False)                      # human rejects A
+
+
+gA=g.decide(r2,"branchA_email",False)
 print(" A decide(reject) ->", gA)
 
 print("\neffects performed:", log)
-# welcome (once), refund (approved). wire rejected. sibling B: released because
-# needs_approval=False and run not fenced -> demonstrates WHY consequential
-# siblings must be needs_approval=True OR the run cancelled on the gated branch.
+
 assert "welcome" in log and log.count("welcome")==1
 assert "refund" in log and "wire" not in log
 print("OK — approve runs, replay+reject blocked; sibling policy demonstrated")

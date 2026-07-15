@@ -1,24 +1,6 @@
-"""Enrich the corpus with authoritative GitHub metadata (stdlib only).
-
-For every INCIDENT that is a GitHub issue, fetch the live issue via the REST
-API and record: state (open/closed), created_at, closed_at, labels, author
-login, and author_association (OWNER/MEMBER/COLLABORATOR/CONTRIBUTOR/NONE).
-This fills the fields seeds.py deliberately left None and, where seeds.py has
-an observed value (title/created date), FLAGS any mismatch instead of
-silently trusting either side.
-
-No dependencies: uses urllib. Honors GITHUB_TOKEN if present (raises the
-unauthenticated 60/hr limit to 5000/hr) -- strongly recommended, since a
-shared IP can exhaust the anonymous limit. On rate-limit or network failure
-the script degrades: it writes what it has and marks the rest
-"enrich_status": "rate_limited" / "error", never inventing values.
-
-Output: results/incidents_enriched.jsonl (one object per incident, original
-fields plus an "enrich" sub-object). Forum/article rows are passed through
-with enrich_status "skipped_non_github".
-
+"""
 Usage:
-  export GITHUB_TOKEN=ghp_...   # optional but recommended
+  export GITHUB_TOKEN=ghp_...
   uv run --no-sync corpus-enrich
 """
 from __future__ import annotations

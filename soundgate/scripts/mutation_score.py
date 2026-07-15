@@ -1,35 +1,4 @@
-#!/usr/bin/env python3
-"""mutation_score.py -- adequacy check for the SoundGate verification harnesses.
-
-WHY: "differential conformance, zero divergences" is only meaningful if the test
-could have FAILED on a wrong implementation. This measures that. It injects
-standard mutation operators (negate a condition, flip ||/&&, swap two branches --
-the same classes cargo-mutants generates) into the REAL admission core
-(src/lib.rs), one per enforced property, and checks a harness CATCHES each.
-
-TWO HARNESSES, BY DESIGN:
-  * exhaustive conformance -- checks every reachable state to depth 5 over a
-    2-run x 2-key domain against the reference model; catches every mutation whose
-    effect is observable in the SINGLE-THREADED semantics.
-  * loom -- exhaustively explores concurrent thread interleavings; catches the
-    mutation to the decide-after-hold fence, which is UNREACHABLE single-threaded
-    (both cancel() and close_run() drop the run's pending effects, so a later
-    decide() takes the None-branch fence, not the post-hold fence) and is reachable
-    only when a decide() races a cancel(). The survivor under the exhaustive
-    harness is therefore expected and precisely delineates the two harnesses'
-    coverage; loom closes it.
-
-Each mutation is applied to the real source and reverted immediately; the original
-is always restored, even on error or Ctrl-C.
-
-RUN (from the soundgate/ crate root; Rust >= 1.85):
-    export PATH=/usr/lib/rust-1.89/bin:$PATH
-    python scripts/mutation_score.py            # exhaustive phase (fast, ~2 min)
-    python scripts/mutation_score.py --loom      # also verify the survivor under loom
-      | tee evidence/mutation_score.txt
-"""
 from __future__ import annotations
-
 import argparse
 import shutil
 import subprocess
@@ -45,7 +14,6 @@ EXHAUSTIVE = ["cargo", "test", "--features", "conformance",
 LOOM = ["cargo", "test", "--test", "loom_gate_test", "--release"]
 LOOM_ENV = {"RUSTFLAGS": "--cfg loom"}
 
-# (name, property, exact_old, exact_new, harness) -- harness that can REACH it.
 MUTATIONS = [
     ("verdict_flip", "P1/P2 hold-until-decided / reject-cancels", "exhaustive",
      "        if approved {\n"

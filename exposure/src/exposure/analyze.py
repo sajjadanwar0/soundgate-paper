@@ -1,17 +1,3 @@
-"""E-EXPOSURE analysis: rates + Wilson 95% CIs from runner JSONL output.
-
-Reports, per (model, task) and aggregated per model (overall and per class):
-  called_rate           = k_called / n            (consequential emitted)
-  exposure_given_called = k_exposed / k_called    (PRIMARY)
-with Wilson score intervals (z=1.96). Errors are excluded from denominators
-and reported separately -- an API failure is not evidence about plan shapes.
-
-DEDUPLICATION: records are deduplicated by (provider, model, task_id,
-run_idx), keeping the FIRST non-error record; later duplicates (e.g. a smoke
-run and a battery run appending to the same file, or a re-run overlapping a
-resume) are dropped and counted. A key whose only records are errors keeps
-one error record for the error report.
-"""
 from __future__ import annotations
 
 import argparse
@@ -38,7 +24,6 @@ def fmt(k: int, n: int) -> str:
         return "--"
     return f"{p:.2f} [{lo:.2f},{hi:.2f}] ({k}/{n})"
 
-
 def main() -> None:
     ap = argparse.ArgumentParser(description="Analyze E-EXPOSURE JSONL files")
     ap.add_argument("inputs", nargs="+", help="JSONL file(s) from exposure-run")
@@ -55,9 +40,8 @@ def main() -> None:
                 try:
                     raw.append(json.loads(line))
                 except json.JSONDecodeError:
-                    pass  # torn final line from a hard kill
+                    pass
 
-    # Deduplicate: first non-error record wins per identity key.
     first_ok: dict[tuple, dict] = {}
     first_err: dict[tuple, dict] = {}
     dropped = 0

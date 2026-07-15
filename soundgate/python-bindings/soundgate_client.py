@@ -1,19 +1,3 @@
-"""Pure-Python client for the SOUNDGATE external gate — zero build.
-
-Speaks the exact line-delimited JSON/TCP protocol of the `soundgate` server
-binary, and computes the same HMAC-SHA256 decision tag. Use this if you would
-rather not build the Rust extension: just run the gate binary and import this.
-
-    from soundgate_client import GateClient
-    gate = GateClient(("127.0.0.1", 8796))          # or secret=b"..."
-    v = gate.submit("run1", "send_email", needs_approval=True)
-    if v.released:
-        do_the_effect()
-
-The PyO3 extension exposes an identical surface (GateClient, Verdict,
-decision_tag); code written against one works against the other.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -74,12 +58,6 @@ class GateError(RuntimeError):
 
 
 class GateClient:
-    """Native-protocol client to an external gate process.
-
-    One persistent TCP connection. Thread-safe for sequential use per instance;
-    create one client per thread for concurrency.
-    """
-
     def __init__(
             self,
             addr: Tuple[str, int] = ("127.0.0.1", 8796),

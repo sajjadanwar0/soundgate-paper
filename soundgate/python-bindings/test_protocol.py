@@ -1,9 +1,6 @@
-"""Validate the client protocol + HMAC against a mock gate that reimplements
-the Rust admission core's logic and the exact line-JSON/HMAC wire protocol."""
 import json, socket, threading, hashlib, hmac as _hmac
 from soundgate_client import GateClient, decision_tag
 
-# ---- mock gate core: mirrors soundgate/src/lib.rs::Gate check ordering ----
 class Core:
     def __init__(self):
         self.released=set(); self.cancelled=set(); self.pending={}; self.rejected=set(); self.closed=set()
@@ -87,9 +84,10 @@ SECRET=b"s3cr3t-key"
 port=run_gate(SECRET); g=GateClient(("127.0.0.1",port), secret=SECRET)
 check("auth submit -> held", g.submit("rA","wire",True).kind, "held_for_approval")
 check("auth approve (valid mac) -> release", g.decide("rA","wire",True).kind, "release")
-# wrong-secret client must be refused by the gate
+
 port2=run_gate(SECRET); bad=GateClient(("127.0.0.1",port2), secret=b"wrong-secret")
 bad.submit("rB","wire",True)
+
 try:
     bad.decide("rB","wire",True); print("  [FAIL] forged mac accepted!"); raise SystemExit(1)
 except Exception as e:

@@ -1,14 +1,3 @@
-//! Self-contained HMAC-SHA256 for decision authenticity (no external crates,
-//! keeping the artifact dependency-light and portable). SHA-256 per FIPS 180-4;
-//! HMAC per RFC 2104. Constant-time tag comparison to avoid timing oracles.
-//!
-//! This exists so decision authenticity is a SHIPPED, TESTED feature rather
-//! than a deployment promise: when the gate holds a shared secret, a `decide`
-//! must carry hmac_sha256(secret, "run_id\neffect_key\napproved") as lowercase
-//! hex, verified BEFORE any gate state is touched. A forged or absent token is
-//! refused, so an attacker who cannot compute the MAC cannot approve or reject
-//! a held effect.
-
 const BLOCK: usize = 64;
 
 #[derive(Clone)]
@@ -48,18 +37,23 @@ impl Sha256 {
 
     fn block(h: &mut [u32; 8], b: &[u8]) {
         let mut w = [0u32; 64];
+
         for i in 0..16 {
             w[i] = u32::from_be_bytes([b[4 * i], b[4 * i + 1], b[4 * i + 2], b[4 * i + 3]]);
         }
+
         for i in 16..64 {
             let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
             let s1 = w[i - 2].rotate_right(17) ^ w[i - 2].rotate_right(19) ^ (w[i - 2] >> 10);
+
             w[i] = w[i - 16]
                 .wrapping_add(s0)
                 .wrapping_add(w[i - 7])
                 .wrapping_add(s1);
         }
+
         let mut v = *h;
+
         for i in 0..64 {
             let s1 = v[4].rotate_right(6) ^ v[4].rotate_right(11) ^ v[4].rotate_right(25);
             let ch = (v[4] & v[5]) ^ ((!v[4]) & v[6]);
@@ -80,6 +74,7 @@ impl Sha256 {
             v[1] = v[0];
             v[0] = t1.wrapping_add(t2);
         }
+
         for i in 0..8 {
             h[i] = h[i].wrapping_add(v[i]);
         }
@@ -87,22 +82,26 @@ impl Sha256 {
 
     fn update(&mut self, mut data: &[u8]) {
         self.len = self.len.wrapping_add(data.len() as u64);
+
         if self.n > 0 {
             let need = 64 - self.n;
             let take = need.min(data.len());
             self.buf[self.n..self.n + take].copy_from_slice(&data[..take]);
             self.n += take;
             data = &data[take..];
+
             if self.n == 64 {
                 let b = self.buf;
                 Sha256::block(&mut self.h, &b);
                 self.n = 0;
             }
         }
+
         while data.len() >= 64 {
             Sha256::block(&mut self.h, &data[..64]);
             data = &data[64..];
         }
+
         if !data.is_empty() {
             self.buf[..data.len()].copy_from_slice(data);
             self.n = data.len();
@@ -112,11 +111,15 @@ impl Sha256 {
     fn finish(mut self) -> [u8; 32] {
         let bits = self.len.wrapping_mul(8);
         self.update(&[0x80]);
+
         while self.n != 56 {
             self.update(&[0]);
         }
+
         self.update(&bits.to_be_bytes());
+
         let mut out = [0u8; 32];
+
         for i in 0..8 {
             out[4 * i..4 * i + 4].copy_from_slice(&self.h[i].to_be_bytes());
         }
@@ -130,21 +133,24 @@ fn sha256(data: &[u8]) -> [u8; 32] {
     s.finish()
 }
 
-/// HMAC-SHA256(key, msg) as raw 32 bytes (RFC 2104).
 pub fn hmac_sha256(key: &[u8], msg: &[u8]) -> [u8; 32] {
     let mut k = [0u8; BLOCK];
+
     if key.len() > BLOCK {
         let d = sha256(key);
         k[..32].copy_from_slice(&d);
     } else {
         k[..key.len()].copy_from_slice(key);
     }
+
     let mut ipad = [0x36u8; BLOCK];
     let mut opad = [0x5cu8; BLOCK];
+
     for i in 0..BLOCK {
         ipad[i] ^= k[i];
         opad[i] ^= k[i];
     }
+
     let mut inner = Sha256::new();
     inner.update(&ipad);
     inner.update(msg);
@@ -155,27 +161,27 @@ pub fn hmac_sha256(key: &[u8], msg: &[u8]) -> [u8; 32] {
     outer.finish()
 }
 
-/// Canonical decision message: fields joined by new\n so no field can be
-/// shifted into another (run/key/approved are unambiguous).
 pub fn decision_tag(secret: &[u8], run_id: &str, effect_key: &str, approved: bool) -> String {
     let msg = format!("{run_id}\n{effect_key}\n{}", if approved { "1" } else { "0" });
     let mac = hmac_sha256(secret, msg.as_bytes());
     let mut s = String::with_capacity(64);
+
     for b in mac {
         s.push_str(&format!("{:02x}", b));
     }
     s
 }
 
-/// Constant-time hex-string comparison (length-independent early exit only on
-/// length mismatch, which is not secret).
 pub fn verify(expected_hex: &str, got_hex: &str) -> bool {
     let a = expected_hex.as_bytes();
     let b = got_hex.as_bytes();
+
     if a.len() != b.len() {
         return false;
     }
+
     let mut diff = 0u8;
+
     for i in 0..a.len() {
         diff |= a[i] ^ b[i];
     }
@@ -186,7 +192,6 @@ pub fn verify(expected_hex: &str, got_hex: &str) -> bool {
 mod tests {
     use super::*;
 
-    // RFC 4231 Test Case 2 (key="Jefe", data="what do ya want for nothing?").
     #[test]
     fn rfc4231_case2() {
         let mac = hmac_sha256(b"Jefe", b"what do ya want for nothing?");
@@ -201,8 +206,8 @@ mod tests {
     fn tag_roundtrip_and_reject() {
         let s = b"shared-secret";
         let good = decision_tag(s, "run1", "refund", false);
+
         assert!(verify(&good, &decision_tag(s, "run1", "refund", false)));
-        // Wrong polarity, wrong key, wrong run, wrong secret all fail.
         assert!(!verify(&good, &decision_tag(s, "run1", "refund", true)));
         assert!(!verify(&good, &decision_tag(s, "run1", "other", false)));
         assert!(!verify(&good, &decision_tag(s, "run2", "refund", false)));

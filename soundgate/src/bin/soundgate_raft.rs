@@ -1,23 +1,3 @@
-//! soundgate_raft: the replicated SOUNDGATE server.
-//!
-//! Two listeners share one tokio runtime:
-//!   * HTTP (axum) on SOUNDGATE_RAFT_HTTP  — peer Raft RPC (/raft/*) and
-//!     cluster admin (/admin/*), plus /metrics and /leader.
-//!   * TCP on SOUNDGATE_RAFT_EFFECT        — the SAME line-delimited JSON
-//!     admission protocol as the single-node server (main.rs), so
-//!     concurrent_bench.rs and every existing client drive it UNCHANGED.
-//!
-//! Each state-changing request is committed to a majority of the cluster via
-//! `raft.client_write(op)` before the verdict is returned — the replicated
-//! analog of the single-node "fsync before acknowledge".
-//!
-//! Env:
-//!   SOUNDGATE_RAFT_NODE_ID   u64 node id (0/1/2)               [required]
-//!   SOUNDGATE_RAFT_HTTP      http bind, e.g. 127.0.0.1:9101    [required]
-//!   SOUNDGATE_RAFT_EFFECT    tcp  bind, e.g. 127.0.0.1:9201    [required]
-//!   SOUNDGATE_RAFT_URL       this node's http URL peers dial   [default http://HTTP]
-//!   SOUNDGATE_RAFT_DATA      sled dir                          [default ./raft-data-<id>]
-
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
@@ -33,12 +13,8 @@ use serde::Deserialize;
 use serde_json::json;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{TcpListener, TcpStream};
-
 use soundgate::Admission;
 
-// The replication layer lives in src/raft_gate/ and is compiled ONLY into this
-// binary (via the path attribute below), so the base `soundgate` library stays
-// dependency-light — it links none of openraft/sled/tokio/axum.
 #[path = "../raft_gate/mod.rs"]
 mod raft_gate;
 use raft_gate::{
@@ -51,8 +27,6 @@ struct AppState {
     node_id: u64,
     this_url: String,
 }
-
-// ─── admission protocol over TCP (mirrors main.rs) ──────────────────────────
 
 #[derive(Debug, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case")]
@@ -74,9 +48,6 @@ enum Request {
     Ping,
 }
 
-/// Serialize a verdict line in the exact wire format the single-node server
-/// uses. `Admission` serializes to `{"verdict":"..."}` already; cancel acks,
-/// ping pongs, non-leader/error report an error verdict.
 fn verdict_line(admission: Option<Admission>) -> String {
     match admission {
         Some(a) => serde_json::to_string(&a).unwrap(),
@@ -87,10 +58,12 @@ fn verdict_line(admission: Option<Admission>) -> String {
 async fn serve_effect(state: Arc<AppState>, stream: TcpStream) {
     let (r, mut w) = stream.into_split();
     let mut lines = BufReader::new(r).lines();
+
     while let Ok(Some(line)) = lines.next_line().await {
         if line.trim().is_empty() {
             continue;
         }
+
         let out = match serde_json::from_str::<Request>(&line) {
             Ok(Request::Ping) => json!({"verdict":"pong"}).to_string(),
             Ok(req) => {
@@ -116,7 +89,7 @@ async fn serve_effect(state: Arc<AppState>, stream: TcpStream) {
                     Request::Cancel { run_id } => GateOp::Cancel { run_id },
                     Request::Ping => unreachable!(),
                 };
-                // Commit to a majority, THEN reply with the applied verdict.
+
                 match state.raft.client_write(op).await {
                     Ok(resp) => verdict_line(resp.data.admission),
                     Err(e) => json!({"verdict":"error","message":format!("{e}")}).to_string(),
@@ -124,15 +97,15 @@ async fn serve_effect(state: Arc<AppState>, stream: TcpStream) {
             }
             Err(e) => json!({"verdict":"error","message":format!("bad request: {e}")}).to_string(),
         };
+
         let mut buf = out.into_bytes();
         buf.push(b'\n');
+
         if w.write_all(&buf).await.is_err() {
             break;
         }
     }
 }
-
-// ─── Raft peer RPC (axum) ───────────────────────────────────────────────────
 
 async fn rpc_append(
     State(s): State<Arc<AppState>>,
@@ -172,8 +145,6 @@ async fn rpc_snapshot(
         ),
     }
 }
-
-// ─── cluster admin (axum) ───────────────────────────────────────────────────
 
 async fn admin_init(State(s): State<Arc<AppState>>) -> impl IntoResponse {
     let mut members = BTreeMap::new();
@@ -270,14 +241,15 @@ async fn main() {
         this_url: this_url.clone(),
     });
 
-    // Effect protocol (TCP) — the benchmark + all clients hit this.
     let effect_state = state.clone();
     let effect_addr_c = effect_addr.clone();
+
     tokio::spawn(async move {
         let listener = TcpListener::bind(&effect_addr_c)
             .await
             .expect("bind effect port");
         tracing::info!("soundgate-raft node {node_id}: effect protocol on {effect_addr_c}");
+
         loop {
             match listener.accept().await {
                 Ok((stream, _)) => {
@@ -289,7 +261,6 @@ async fn main() {
         }
     });
 
-    // Raft RPC + admin (HTTP).
     let app = Router::new()
         .route("/raft/append-entries", post(rpc_append))
         .route("/raft/vote", post(rpc_vote))
