@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
@@ -121,7 +121,7 @@ dependencies = [
     { name = "frozenlist" },
     { name = "multidict" },
     { name = "propcache" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
     { name = "yarl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/82/78/8ea7308cac6934de8c74a14f3d5f65d1c89287426688be79538d0e5c013d/aiohttp-3.14.1.tar.gz", hash = "sha256:307f2cff90a764d329e77040603fa032db89c5c24fdad50c4c15334cba744035", size = 7955794, upload-time = "2026-06-07T21:09:35.529Z" }
@@ -216,7 +216,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -306,7 +306,7 @@ version = "4.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3b/72/5562aabb8dd7181e8e860622a38bea08d17842b99ecd4c91f84ac95251b0/anyio-4.14.1.tar.gz", hash = "sha256:8d648a3544c1a700e3ff78615cd679e4c5c3f149904287e73687b2596963629e", size = 254831, upload-time = "2026-06-24T20:56:06.017Z" }
 wheels = [
@@ -640,7 +640,7 @@ name = "click"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
 wheels = [
@@ -809,6 +809,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/64/a4/f71d9cf3a5ac257c993b5ca3f93df5f7fb395c725e7f1e6479d2514173c3/dataclasses_json-0.6.7.tar.gz", hash = "sha256:b6b3e528266ea45b9535223bc53ca645f5208833c29229e847b3f26a1cc55fc0", size = 32227, upload-time = "2024-06-09T16:20:19.103Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c3/be/d0d44e092656fe7a06b55e6103cbce807cdbdee17884a5367c68c9860853/dataclasses_json-0.6.7-py3-none-any.whl", hash = "sha256:0dbf33f26c8d5305befd61b39d2b3414e8a407bedc2834dea9b8d642666fb40a", size = 28686, upload-time = "2024-06-09T16:20:16.715Z" },
+]
+
+[[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
 ]
 
 [[package]]
@@ -2322,18 +2331,19 @@ wheels = [
 
 [[package]]
 name = "nltk"
-version = "3.9.4"
+version = "3.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
+    { name = "defusedxml" },
     { name = "joblib" },
     { name = "regex", version = "2026.1.15", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-10-agentprobe-crewai'" },
     { name = "regex", version = "2026.6.28", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-10-agentprobe-msaf' or extra == 'extra-10-agentprobe-openai-sdk' or extra != 'extra-10-agentprobe-crewai'" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/a1/b3b4adf15585a5bc4c357adde150c01ebeeb642173ded4d871e89468767c/nltk-3.9.4.tar.gz", hash = "sha256:ed03bc098a40481310320808b2db712d95d13ca65b27372f8a403949c8b523d0", size = 2946864, upload-time = "2026-03-24T06:13:40.641Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/02/df4f105b28a7c16b0e41423bc09cf0f1b8a305df4ef0b10ca74a2e4c648c/nltk-3.10.0.tar.gz", hash = "sha256:4fbac1d98203cbcd1b5d94a2877fb822300072d80604a5e7fae49d2c5f84e8c1", size = 3089244, upload-time = "2026-07-08T02:39:13.562Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/91/04e965f8e717ba0ab4bdca5c112deeab11c9e750d94c4d4602f050295d39/nltk-3.9.4-py3-none-any.whl", hash = "sha256:f2fa301c3a12718ce4a0e9305c5675299da5ad9e26068218b69d692fda84828f", size = 1552087, upload-time = "2026-03-24T06:13:38.47Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/89/a0b0f35e2820d6a99d75ea1c11977ee6d5c9e6658eceb45b0c7620881faa/nltk-3.10.0-py3-none-any.whl", hash = "sha256:54ff84d4916d3ef127e8953bee0023f6a6b320b75d634a19e06ef056d3d244bf", size = 1716144, upload-time = "2026-07-08T02:39:09.753Z" },
 ]
 
 [[package]]
@@ -4031,7 +4041,11 @@ version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/1e/51/8558a3d8e5b6f4bf78c63c8112e86e78b39c6ce821332e7bdd89d2f5099d/soundgate-0.1.0.tar.gz", hash = "sha256:5f8cf384552581ad2f50dfeab49d08e4ce05c0507f9486e33cfef052daf3c8f5", size = 342124, upload-time = "2026-07-08T15:17:23.941Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/51/35dbb88b60ca398d7976ba7443e169b1b4fc4fcd4e45f9a201040f1c1aac/soundgate-0.1.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:ffd85844147c3be277c9f6cfca8170fa000805e9408370a0e7203fd6a91bffb7", size = 277069, upload-time = "2026-07-15T05:54:44.933Z" },
+    { url = "https://files.pythonhosted.org/packages/22/7a/af3939707d6e59b891ab84f4c7ba590edc3a862be3f4cf4f671bec829cf0/soundgate-0.1.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f84eb9b9be8c9efc2a7276f0dc40e6e70e168fa13e16ffee074df695515bb468", size = 292824, upload-time = "2026-07-15T05:54:46.512Z" },
+    { url = "https://files.pythonhosted.org/packages/11/85/621e81562c552ea9f76dda9eef0142142f936b51d6730dcbfde90ffe3824/soundgate-0.1.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c8016bbc849cb30029c011eb27d9fdc8eb23ccc0358cd8c9843291532a42c61b", size = 308870, upload-time = "2026-07-15T05:54:47.808Z" },
     { url = "https://files.pythonhosted.org/packages/1e/33/a03675d143135e84d2a456f0447dffa6fba3d03058626ed0d6057c508c64/soundgate-0.1.0-cp38-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:b0d97e6a7db46914d87276af5cd9a4df45afdc474a3344c4957fc12f2af3af3a", size = 299793, upload-time = "2026-07-08T15:17:19.399Z" },
+    { url = "https://files.pythonhosted.org/packages/01/07/d4d717892d2b1e281c5fbc7bb5ed90bb58e59ef2a2957cd3e93c3bf403a1/soundgate-0.1.0-cp38-abi3-win_amd64.whl", hash = "sha256:9f6480e4d06147b1b81c46194e277dbece812cb29b519cd053f2da82f3819736", size = 211495, upload-time = "2026-07-15T05:54:49.22Z" },
 ]
 
 [[package]]
@@ -4258,7 +4272,7 @@ name = "tqdm"
 version = "4.68.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/87/d7/0535a28b1f5f24f6612fb3ff1e89fb1a8d160fee0f976e0aa6803862134b/tqdm-4.68.3.tar.gz", hash = "sha256:00dfa48452b6b6cfae3dd9885636c23d3422d1ec97c66d96818cbd5e0821d482", size = 170596, upload-time = "2026-06-17T07:36:52.105Z" }
 wheels = [
