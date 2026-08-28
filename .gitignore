@@ -77,3 +77,18 @@ Thumbs.db
 /*.tar.gz
 _*.log
 /soundgate/evidence/concurrent_bench.txt
+# paper build (not part of the artifact)
+soundgate.tex
+soundgate.pdf
+access_kit.zip
+ieeeaccess.cls
+spotcolor.sty
+*.fd
+*.map
+*.pfb
+*.tfm
+logo.png
+notaglinelogo.png
+bullet.png
+sajjad.png
+response_to_reviewers.docx
