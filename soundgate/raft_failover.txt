@@ -8,4 +8,3 @@
 
 # RESULT: PASS -- new leader in 1.92s; pre-crash fence survived
 #         (no double-release across failover); cluster still admitting.
-# send me raft_failover.txt

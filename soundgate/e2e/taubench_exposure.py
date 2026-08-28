@@ -54,7 +54,39 @@ def complete_real(messages, model, provider, tools_info, temperature):
     from litellm import completion
     res = completion(messages=messages, model=model, custom_llm_provider=provider,
                      tools=tools_info, temperature=temperature)
-    return res.choices[0].message.model_dump()
+    msg = res.choices[0].message.model_dump()
+    u = getattr(res, "usage", None)
+    msg["_usage"] = ({"prompt_tokens": int(getattr(u, "prompt_tokens", 0) or 0),
+                      "completion_tokens": int(getattr(u, "completion_tokens", 0) or 0)}
+                     if u is not None else {})
+    return msg
+
+
+class BudgetExceeded(RuntimeError):
+    pass
+
+
+class BudgetMeter:
+    """Agent-side token cap. Counts the agent model's prompt+completion tokens
+    only; the tau-bench user simulator's own calls are additional and must be
+    watched on the provider dashboard."""
+
+    def __init__(self, cap: int | None):
+        self.cap = cap
+        self.prompt = 0
+        self.completion = 0
+
+    def add(self, u: dict):
+        self.prompt += int(u.get("prompt_tokens") or 0)
+        self.completion += int(u.get("completion_tokens") or 0)
+
+    @property
+    def total(self) -> int:
+        return self.prompt + self.completion
+
+    @property
+    def exceeded(self) -> bool:
+        return self.cap is not None and self.total >= self.cap
 
 
 class MockModel:
@@ -80,14 +112,20 @@ class MockModel:
         return {"role": "assistant", "content": "All set -- anything else?", "tool_calls": None}
 
 def run_episode(env, complete, model, provider, tools_info, env_name,
-                task_index, max_turns, temperature):
+                task_index, max_turns, temperature, meter=None):
     from tau_bench.types import Action, RESPOND_ACTION_NAME
     obs = env.reset(task_index=task_index).observation
     messages = [{"role": "system", "content": env.wiki},
                 {"role": "user", "content": obs}]
     turns = []  # one record per assistant tool-call batch
     for _ in range(max_turns):
+        if meter is not None and meter.exceeded:
+            raise BudgetExceeded(
+                f"agent-token cap {meter.cap} reached (used {meter.total})")
         msg = complete(messages, model, provider, tools_info, temperature)
+        usage = msg.pop("_usage", None)
+        if meter is not None and usage:
+            meter.add(usage)
         tool_calls = msg.get("tool_calls") or []
         if tool_calls:
             names = [tc["function"]["name"] for tc in tool_calls]
@@ -135,7 +173,9 @@ def run_episode(env, complete, model, provider, tools_info, env_name,
     return turns
 
 
-def aggregate_and_report(all_turns: list[dict], env_name: str, out_path: str | None):
+def aggregate_and_report(all_turns: list[dict], env_name: str, out_path: str | None,
+                         receipt_path: str | None = None, meta: dict | None = None,
+                         append: bool = False):
     tool_turns = len(all_turns)
     parallel_turns = sum(1 for t in all_turns if t["n_tools"] > 1)
     cons_batches = [t for t in all_turns if t["is_cons_batch"]]
@@ -174,10 +214,26 @@ def aggregate_and_report(all_turns: list[dict], env_name: str, out_path: str | N
 
     if out_path:
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(out_path, "w") as fh:
+        with open(out_path, "a" if append else "w") as fh:
             for t in all_turns:
                 fh.write(json.dumps(t) + "\n")
-        print(f"  per-turn records -> {out_path}")
+        print(f"  per-turn records -> {out_path} ({'appended' if append else 'written'})")
+    if receipt_path:
+        import datetime
+        cons_batches = [t for t in all_turns if t["is_cons_batch"]]
+        benign_sib = sum(1 for t in cons_batches if t["benign_sibling"])
+        cons_sib = sum(1 for t in cons_batches if t.get("cons_sibling"))
+        Path(receipt_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(receipt_path, "w") as fh:
+            fh.write("# tau-bench ecological exposure receipt (R1-2 extension)\n")
+            for k, v in (meta or {}).items():
+                fh.write(f"# {k}: {v}\n")
+            fh.write(f"# generated: {datetime.datetime.utcnow().isoformat()}Z\n")
+            fh.write(f"# tool-call turns: {len(all_turns)}\n")
+            fh.write(f"# consequential batches: {len(cons_batches)}\n")
+            fh.write(f"# benign-sibling | consequential: {benign_sib}/{len(cons_batches)}\n")
+            fh.write(f"# cons-sibling (>=2 writes) | consequential: {cons_sib}/{len(cons_batches)}\n")
+        print(f"  receipt -> {receipt_path}")
 
 
 def cmd_run(args) -> int:
@@ -207,26 +263,57 @@ def cmd_run(args) -> int:
         assert any(t["n_tools"] > 1 for t in turns), "self-test: no parallel batch captured"
         print("SELF-TEST PASS: batch capture, parallel detection, consequential + benign-"
               "sibling classification, and env execution all work.")
+
+        mm = MockModel()
+
+        def mm_usage(*a, **k):
+            m = mm(*a, **k)
+            m["_usage"] = {"prompt_tokens": 700, "completion_tokens": 300}
+            return m
+        meter = BudgetMeter(1500)
+        try:
+            run_episode(env, mm_usage, "mock", "mock", env.tools_info,
+                        "retail", 0, max_turns=6, temperature=0.0, meter=meter)
+            raise AssertionError("budget cap did not trip")
+        except BudgetExceeded as exc:
+            assert meter.total == 2000, f"meter counted {meter.total}, expected 2000"
+            print(f"SELF-TEST PASS: budget cap trips cleanly after the paid call ({exc}).")
         aggregate_and_report(turns, "retail", None)
 
         return 0
 
     from tau_bench.envs import get_env
     all_turns: list[dict] = []
+    meter = BudgetMeter(args.max_agent_tokens)
+    user_provider = args.user_provider or args.provider
+    stopped_early = None
 
     for idx in range(args.start, args.end):
         env = get_env(args.env, user_strategy=args.user_strategy, user_model=args.user_model,
-                      user_provider=args.provider, task_split=args.task_split, task_index=idx)
+                      user_provider=user_provider, task_split=args.task_split, task_index=idx)
         try:
             turns = run_episode(env, complete_real, args.model, args.provider,
-                                env.tools_info, args.env, idx, args.max_turns, args.temperature)
+                                env.tools_info, args.env, idx, args.max_turns,
+                                args.temperature, meter=meter)
+        except BudgetExceeded as e:
+            stopped_early = f"task {idx}: {e}"
+            print(f"  BUDGET STOP at {stopped_early}", file=sys.stderr)
+            break
         except Exception as e:
             print(f"  [task {idx}] error: {e}", file=sys.stderr)
             continue
         all_turns.extend(turns)
         print(f"  task {idx}: {len(turns)} tool-turns, "
-              f"{sum(t['is_cons_batch'] for t in turns)} consequential batches")
-    aggregate_and_report(all_turns, args.env, args.out)
+              f"{sum(t['is_cons_batch'] for t in turns)} consequential batches"
+              f" (agent tokens so far: {meter.total})")
+    meta = {"env": args.env, "provider": args.provider, "model": args.model,
+            "user_provider": user_provider, "user_model": args.user_model,
+            "task_range": f"{args.start}..{args.end}", "temperature": args.temperature,
+            "agent_tokens_used": meter.total, "agent_token_cap": meter.cap,
+            "stopped_early": stopped_early or "no",
+            "note": "cap covers agent-side tokens only; user-simulator usage is additional"}
+    aggregate_and_report(all_turns, args.env, args.out,
+                         receipt_path=args.receipt, meta=meta, append=args.append)
     return 0
 
 def main() -> int:
@@ -245,6 +332,13 @@ def main() -> int:
     r.add_argument("--max-turns", type=int, default=30)
     r.add_argument("--temperature", type=float, default=0.0)
     r.add_argument("--out", default=None)
+    r.add_argument("--append", action="store_true",
+                   help="append to --out instead of overwriting (multi-session accumulation)")
+    r.add_argument("--receipt", default=None, help="write an evidence-style receipt here")
+    r.add_argument("--user-provider", default=None,
+                   help="provider for the user simulator (default: same as --provider)")
+    r.add_argument("--max-agent-tokens", type=int, default=None,
+                   help="hard cap on agent-side prompt+completion tokens; stops cleanly")
     r.add_argument("--self-test", action="store_true", help="offline mock, no API")
     r.set_defaults(func=cmd_run)
     args = ap.parse_args()

@@ -1,0 +1,12 @@
+# soundgate raft fault-injection receipt; 2026-08-28T04:36:38Z
+# scenario S1: follower crash: hold survives, quorum decides, follower catches up
+# initial leader: node 0 (effect 9201)
+# submit needs_approval on leader -> {"verdict":"held_for_approval"}   (expect held_for_approval)
+# killing follower node 1 (pid 53151)
+# decide approve on leader with 2/3 alive -> {"verdict":"release"}   (expect release)
+# fresh submit still admits (2/3) -> {"verdict":"release"}   (expect release)
+# restarting follower node 1
+# follower 1 caught up (applied >= leader last_log_index)
+# duplicate of decided id refuses -> {"verdict":"refused_duplicate"}   (expect refused_duplicate)
+# single-release ledger: OK (2 distinct released ids)
+# RESULT: PASS

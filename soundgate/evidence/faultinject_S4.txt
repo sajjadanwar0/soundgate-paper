@@ -1,0 +1,20 @@
+# soundgate raft fault-injection receipt; 2026-08-28T04:36:38Z
+# scenario S4: follower total state loss: safety must hold; resync liveness measured per trigger
+# initial leader: node 0 (effect 9201)
+# submit+auto-release on leader -> {"verdict":"release"}   (expect release)
+# stopping follower node 1 and DELETING ./raft-data-1
+# restarting follower node 1 from empty state
+# MEASURED: resync under incumbent leader with quiescent log: STALLED (20s)
+#   leader's replication watermark for node 1 stays at its pre-loss index; no log transfer occurs
+# metrics[node 0] {"current_leader":0,"current_term":1,"id":0,"last_applied":{"index":6,"leader_id":{"node_id":0,"term":1}},"last_log_index":6,"membership_config":{"log_id":{"index":5,"leader_id":{"node_id":0,"term":1}},"membership":{"configs":[[0,1,2]],"nodes":{"0":{"addr":"http://127.0.0.1:9101"},"1":{"addr":"http://127.0.0.1:9102"},"2":{"addr":"http://127.0.0.1:9103"}}}},"purged":null,"replication":{"0":{"index":6,"leader_id":{"node_id":0,"term":1}},"1":{"index":6,"leader_id":{"node_id":0,"term":1}},"2":{"index":6,"leader_id":{"node_id":0,"term":1}}},"running_state":{"Ok":null},"snapshot":null,"state":"Leader","vote":{"committed":true,"leader_id":{"node_id":0,"term":1}}}
+# metrics[node 1] {"current_leader":null,"current_term":1,"id":1,"last_applied":null,"last_log_index":null,"membership_config":{"log_id":null,"membership":{"configs":[],"nodes":{}}},"purged":null,"replication":null,"running_state":{"Ok":null},"snapshot":null,"state":"Learner","vote":{"committed":true,"leader_id":{"node_id":0,"term":1}}}
+# metrics[node 2] {"current_leader":0,"current_term":1,"id":2,"last_applied":{"index":6,"leader_id":{"node_id":0,"term":1}},"last_log_index":6,"membership_config":{"log_id":{"index":5,"leader_id":{"node_id":0,"term":1}},"membership":{"configs":[[0,1,2]],"nodes":{"0":{"addr":"http://127.0.0.1:9101"},"1":{"addr":"http://127.0.0.1:9102"},"2":{"addr":"http://127.0.0.1:9103"}}}},"purged":null,"replication":null,"running_state":{"Ok":null},"snapshot":null,"state":"Follower","vote":{"committed":true,"leader_id":{"node_id":0,"term":1}}}
+# probe write under incumbent leader -> {"verdict":"release"}   (expect release)
+# MEASURED: first new committed write triggered full resync
+# killing current leader node 0 to force re-election over the rebuilt follower
+# post-loss leader: node 1
+# resync trigger: first-write
+# released id from before the state loss is STILL fenced -> {"verdict":"refused_duplicate"}   (expect refused_duplicate)
+# fresh submit admits -> {"verdict":"release"}   (expect release)
+# single-release ledger: OK (3 distinct released ids)
+# RESULT: PASS

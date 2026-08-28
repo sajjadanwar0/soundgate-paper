@@ -1,0 +1,3 @@
+# naturalistic depth arm receipt (recomputed from jsonl)
+# runs: 125  dangerous (>=2 distinct writes, one turn): 125/125
+# preamble_turns: [12]

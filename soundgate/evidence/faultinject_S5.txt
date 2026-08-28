@@ -1,0 +1,11 @@
+# soundgate raft fault-injection receipt; 2026-08-28T04:36:38Z
+# scenario S5: quorum loss: lone leader fails closed; recovery admits; no phantom release
+# initial leader: node 0 (effect 9201)
+# killing BOTH followers (nodes 1,2) -- leader retains no quorum
+# submit under lost quorum -> CONN_ERROR:TimeoutError:timed out   (expect anything but release)
+# restarting both followers
+# both followers caught up
+# re-submit stalled id after recovery -> {"verdict":"refused_duplicate"}   (release XOR refused_duplicate; both safe, never two releases)
+# fresh submit admits after recovery -> {"verdict":"release"}   (expect release)
+# single-release ledger: OK (1 distinct released ids)
+# RESULT: PASS

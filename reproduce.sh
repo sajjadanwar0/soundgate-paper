@@ -136,6 +136,29 @@ PY
 )
 eq "tau-bench ecological arm hard null (0/71)" "$TAU" "0/71"
 
+# --- R1-2 extension: three models, near-full sets, depth arm -----------------
+R12="$(find_one f r1_2_summary.txt '*/evidence/*')"
+if [[ -n "$R12" ]]; then
+  read -r X_BEN X_SIB X_POOL X_DEPTH X_FILES < <(python3 - "$R12" <<'PY'
+import re, sys
+t = open(sys.argv[1]).read()
+g = lambda p: (re.search(p, t).group(1) if re.search(p, t) else "?")
+files = len(re.findall(r"# taubench_ext_\w+: turns=", t))
+print(g(r"POOLED extension: .* benign_sib=(\S+)"),
+      g(r"POOLED extension: .* cons_sib=(\S+)"),
+      g(r"POOLED with original arm \(0/71\): benign_sib=(\S+)"),
+      g(r"DEPTH: dangerous=(\S+)"), f"{files}/4")
+PY
+)
+  eq "R1-2 ext: pooled benign-sibling null (three models)" "$X_BEN" "0/189"
+  eq "R1-2 ext: pooled distinct-multi-write batches" "$X_SIB" "31/189"
+  eq "R1-2 ext: benign-sibling pooled with original arm" "$X_POOL" "0/260"
+  eq "R1-2 depth arm: both-writes batching at 12-pair context depth" "$X_DEPTH" "125/125"
+  eq "R1-2 ext: per-model-env record files summarized" "$X_FILES" "4/4"
+else
+  fail "r1_2_summary.txt: receipt missing (run scripts/r1_2_summarize.py)"
+fi
+
 # --- R1 randomized structural sweep: leak by relation class ------------------
 R1F=$(find_one f "results_fwa.jsonl")
 if [[ -n "$R1F" ]]; then
@@ -179,6 +202,26 @@ if [[ -f "$LL" ]]; then
   fi
 else skip "landlock_workdir.txt missing; Landlock rung unevaluated"; fi
 
+# --- Mediation linter at deployment scale ------------------------------------
+MLM="$(find_one f mediation_lint_manytool.txt '*/evidence/*')"
+if [[ -n "$MLM" ]]; then
+  read -r ML_D ML_Y ML_FP ML_RES < <(python3 - "$MLM" <<'PY'
+import re, sys
+t = open(sys.argv[1]).read()
+g = lambda p: (re.search(p, t) or [None]) and (re.search(p, t).group(1) if re.search(p, t) else "?")
+print(g(r"direct-call bypasses flagged: (\S+)"),
+      g(r"dynamic-dispatch bypasses flagged: (\S+)"),
+      g(r"false positives on legitimate wrapped call sites: (\d+)"),
+      g(r"RESULT: (\w+)"))
+PY
+)
+  eq "Mediation linter at 60-tool scale: direct-call bypasses flagged" "$ML_D" "8/8"
+  eq "Mediation linter at 60-tool scale: dynamic dispatch flagged (stated blindness)" "$ML_Y" "0/4"
+  eq "Mediation linter at 60-tool scale: false positives, RESULT" "$ML_FP,$ML_RES" "0,PASS"
+else
+  fail "mediation_lint_manytool.txt: receipt missing"
+fi
+
 # --- Differential + exhaustive conformance ----------------------------------
 grep -q "12000000 operations" "$EVID/conformance.txt" 2>/dev/null \
   && ok "Differential conformance: 12,000,000 ops, model==code every verdict" \
@@ -217,6 +260,63 @@ NET0=$(grep -E 'raft-3node' "$EVID/netem_raft.txt" 2>/dev/null | grep -oE 'thpt_
 NET10=$(grep -E 'raft-3node,clients=1,' "$EVID/netem_raft.txt" 2>/dev/null | grep -oE 'thpt_adm_per_s=[0-9]+' | grep -oE '[0-9]+' | sort -n | head -1)
 [[ -n "$NET0"  ]] && ok "netem WAN sweep present: peak ${NET0} adm/s (RTT~0), single-client floor ${NET10:-?} adm/s (RTT~10ms)" \
                   || fail "netem_raft.txt: throughput rows not found"
+
+# --- Replicated tier: failover + fault-injection suite ----------------------
+FIA_DIR="$EVID"
+RFO="$(find_one f raft_failover.txt)"
+if [[ -n "$RFO" ]] && grep -q "RESULT: PASS" "$RFO"; then
+  ok "Raft failover receipt: PASS (single leader kill)"
+else
+  fail "raft_failover.txt: missing or not PASS"
+fi
+read -r FI_PASS FI_MOCK FI_ELEC FI_S4 FI_S5 < <(python3 - "$FIA_DIR" "$RFO" <<'PY'
+import re, sys, pathlib
+ev = pathlib.Path(sys.argv[1]); rfo = sys.argv[2]
+npass = nmock = 0; times = []
+s4 = "missing"; s5 = "missing"
+for i in range(1, 6):
+    p = ev / f"faultinject_S{i}.txt"
+    if not p.exists():
+        continue
+    txt = p.read_text()
+    if "RESULT: PASS" in txt and "single-release ledger: OK" in txt:
+        npass += 1
+    if "MOCK" in txt:
+        nmock += 1
+    if i == 2:
+        m = re.search(r"new leader elected: .* in ([0-9.]+)s", txt)
+        if m:
+            times.append(float(m.group(1)))
+    if i == 4:
+        if "STALLED" in txt:
+            m = re.search(r"resync trigger: (\S+)", txt)
+            s4 = m.group(1) if m else "no-trigger-line"
+        else:
+            s4 = "no-stall-line"
+    if i == 5:
+        line = next((l for l in txt.splitlines() if "submit under lost quorum" in l), "")
+        s5 = "fail-closed" if line and '"verdict":"release"' not in line else "RELEASED"
+if rfo:
+    m = re.search(r"in ([0-9.]+)s", open(rfo).read())
+    if m:
+        times.append(float(m.group(1)))
+inrange = sum(1 for x in times if 1.9 <= round(x, 1) <= 2.2)
+print(npass, nmock, f"{inrange}/{len(times)}", s4, s5)
+PY
+)
+eq "Fault injection: scenarios PASS with single-release ledger" "$FI_PASS" "5"
+eq "Fault injection: receipts free of MOCK self-test label" "$FI_MOCK" "0"
+eq "Elections within the stated 1.9--2.2 s (S2 + failover receipts)" "$FI_ELEC" "2/2"
+eq "S4: quiescent stall measured; resync trigger" "$FI_S4" "first-write"
+eq "S5: submit under lost quorum" "$FI_S5" "fail-closed"
+grep -q "PASS: S1 S2 S3 S4 S5" "$FIA_DIR/faultinject_summary.txt" 2>/dev/null \
+  && ok "Fault-injection summary: PASS S1--S5, FAIL none" \
+  || fail "faultinject_summary.txt: missing or not all-PASS"
+FI_SCRIPTS=0
+for s in faultinject_raft.sh start_soundgate_cluster.sh mock_cluster.py; do
+  [[ -f "$CRATE/scripts/$s" ]] && FI_SCRIPTS=$((FI_SCRIPTS+1))
+done
+eq "Fault harness committed (suite + cluster script + mock)" "$FI_SCRIPTS/3" "3/3"
 
 # --- Real-endpoint webhook demo ---------------------------------------------
 grep -q "SoundGate delivered zero POSTs" "$EVID/webhook_leak_demo.txt" 2>/dev/null \

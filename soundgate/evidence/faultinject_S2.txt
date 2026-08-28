@@ -1,0 +1,13 @@
+# soundgate raft fault-injection receipt; 2026-08-28T04:36:38Z
+# scenario S2: leader crash with a hold in flight: decided exactly once on new leader
+# initial leader: node 0 (effect 9201)
+# pre-crash submit (auto) releases -> {"verdict":"release"}   (expect release)
+# submit needs_approval -> held -> {"verdict":"held_for_approval"}   (expect held_for_approval)
+# killing leader node 0 (pid 53431) with the hold in flight ...
+# new leader elected: node 2 (effect 9203) in 2.17s
+# decide the in-flight hold on NEW leader -> {"verdict":"release"}   (expect release)
+# re-decide same id (no second release) -> {"verdict":"refused_duplicate"}   (expect anything but release)
+# pre-crash released id still fenced -> {"verdict":"refused_duplicate"}   (expect refused_duplicate)
+# fresh submit admits on new leader -> {"verdict":"release"}   (expect release)
+# single-release ledger: OK (3 distinct released ids)
+# RESULT: PASS

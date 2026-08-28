@@ -1,0 +1,6 @@
+# tau-bench ecological exposure receipt (R1-2 extension; probe+full,
+# recomputed from taubench_ext_openai_retail.jsonl by r1_2_summarize.py)
+# tool-call turns: 213
+# consequential batches: 48
+# benign-sibling | consequential: 0/48
+# cons-sibling (>=2 writes) | consequential: 9/48

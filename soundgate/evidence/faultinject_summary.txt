@@ -1,0 +1,4 @@
+# soundgate raft fault-injection summary; 2026-08-28T04:36:38Z
+# PASS: S1 S2 S3 S4 S5
+# FAIL: <none>
+# invariant: no (run_id,effect_key) released more than once, cluster-wide, in any scenario

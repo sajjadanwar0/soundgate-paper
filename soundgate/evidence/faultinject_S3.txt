@@ -1,0 +1,12 @@
+# soundgate raft fault-injection receipt; 2026-08-28T04:36:38Z
+# scenario S3: leader pause (SIGSTOP): decision moves; resumed leader cannot double-release
+# initial leader: node 0 (effect 9201)
+# submit needs_approval -> held -> {"verdict":"held_for_approval"}   (expect held_for_approval)
+# SIGSTOP leader node 0 (pid 53706) -- GC-pause nemesis
+# new leader elected while old one is frozen: node 1
+# decide pending hold on NEW leader -> {"verdict":"release"}   (expect release)
+# SIGCONT old leader node 0 -- it wakes with stale leadership
+# decide same id at OLD leader's effect port -> {"message":"has to forward request to: Some(1), Some(BasicNode { addr: \"http://127.0.0.1:9102\" })","verdict":"error"}   (expect anything but release)
+# duplicate submit of decided id (any live port) -> {"verdict":"refused_duplicate"}   (expect anything but release)
+# single-release ledger: OK (1 distinct released ids)
+# RESULT: PASS

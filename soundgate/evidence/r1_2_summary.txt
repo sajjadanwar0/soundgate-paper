@@ -1,0 +1,8 @@
+# R1-2 extension summary -- recomputed from committed jsonl records
+# taubench_ext_deepseek_airline: turns=330 cons=42 benign_sib=0/42 cons_sib=5/42
+# taubench_ext_deepseek_retail: turns=359 cons=65 benign_sib=0/65 cons_sib=11/65
+# taubench_ext_openai_airline: turns=186 cons=34 benign_sib=0/34 cons_sib=6/34
+# taubench_ext_openai_retail: turns=213 cons=48 benign_sib=0/48 cons_sib=9/48
+# POOLED extension: turns=1088 cons=189 benign_sib=0/189 cons_sib=31/189
+# POOLED with original arm (0/71): benign_sib=0/260 (upper95=0.015)
+# DEPTH: dangerous=125/125 preamble_turns=[12]

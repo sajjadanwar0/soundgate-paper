@@ -1,0 +1,16 @@
+# mediation linter at deployment scale; synthetic many-tool fixture
+# fixture: 60 effect callables across 8 modules, 349 lines; wrapper: gate_effect
+# seeded bypasses: 8 static (bare + attribute call), 4 dynamic (getattr, dict dispatch, alias, closure alias)
+# linter findings:
+#   manytool_fixture/tools_billing.py:52: effect `create_billing` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_billing.py:58: effect `delete_billing` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_deploy.py:52: effect `update_deploy` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_deploy.py:58: effect `provision_deploy` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_mail.py:52: effect `send_mail` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_mail.py:58: effect `capture_mail` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_tickets.py:52: effect `publish_tickets` called outside `gate_effect` (unmediated path)
+#   manytool_fixture/tools_tickets.py:58: effect `notify_tickets` called outside `gate_effect` (unmediated path)
+# direct-call bypasses flagged: 8/8
+# dynamic-dispatch bypasses flagged: 0/4 (stated blindness, measured)
+# false positives on legitimate wrapped call sites: 0
+# RESULT: PASS
