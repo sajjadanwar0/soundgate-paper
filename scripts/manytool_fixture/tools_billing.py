@@ -1,5 +1,4 @@
 """Tools for the billing domain (synthetic; 10 effect callables)."""
-from .registry import EFFECTS
 
 def send_billing(payload):
     return ("send_billing", payload)
@@ -34,7 +33,7 @@ def provision_billing(payload):
 def gate_effect(name, payload):
     """Sanctioned wrapper: submits to the gate before performing."""
     fn = globals()[name]
-    return fn(payload)  # inside the wrapper: mediated by convention
+    return fn(payload)
 
 def run_billing_pipeline(payload):
     gate_effect("send_billing", payload)
@@ -49,10 +48,10 @@ def run_billing_pipeline(payload):
     gate_effect("provision_billing", payload)
 
 def legacy_create_billing(payload):
-    return create_billing(payload)  # SEEDED-STATIC-BYPASS (bare call)
+    return create_billing(payload)
 
 class _Client:
     delete_billing = staticmethod(delete_billing)
 
 def shim_delete_billing(payload):
-    return _Client().delete_billing(payload)  # SEEDED-STATIC-BYPASS (attribute call)
+    return _Client().delete_billing(payload)

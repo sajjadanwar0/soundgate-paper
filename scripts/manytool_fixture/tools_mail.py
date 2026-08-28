@@ -49,10 +49,10 @@ def run_mail_pipeline(payload):
     gate_effect("provision_mail", payload)
 
 def legacy_send_mail(payload):
-    return send_mail(payload)  # SEEDED-STATIC-BYPASS (bare call)
+    return send_mail(payload)
 
 class _Client:
     capture_mail = staticmethod(capture_mail)
 
 def shim_capture_mail(payload):
-    return _Client().capture_mail(payload)  # SEEDED-STATIC-BYPASS (attribute call)
+    return _Client().capture_mail(payload)  

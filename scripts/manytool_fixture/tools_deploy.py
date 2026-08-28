@@ -1,4 +1,4 @@
-"""Tools for the deploy domain (synthetic; 10 effect callables)."""
+"""Tools for the deployment domain (synthetic; 10 effect callables)."""
 from .registry import EFFECTS
 
 def send_deploy(payload):

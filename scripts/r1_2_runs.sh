@@ -1,24 +1,5 @@
 #!/usr/bin/env bash
-# r1_2_runs.sh -- staged runner for the R1-2 extension (more naturalistic +
-# longer multi-turn live evaluation). Run from the repo root. Keys come from
-# soundgate/.env (never paste keys anywhere else).
-#
-#   ./scripts/r1_2_runs.sh selftest              # free; no API
-#   ./scripts/r1_2_runs.sh probe deepseek        # ~5 episodes; calibrates cost
-#   ./scripts/r1_2_runs.sh probe openai
-#   ./scripts/r1_2_runs.sh probe anthropic       # needs ANTHROPIC_MODEL=<id from your console>
-#   CAP=4000000 ./scripts/r1_2_runs.sh full deepseek
-#   CAP=2000000 ./scripts/r1_2_runs.sh full openai
-#   CAP=1200000 ANTHROPIC_MODEL=<id> ./scripts/r1_2_runs.sh full anthropic
-#   ./scripts/r1_2_runs.sh depth                 # long-conversation arm (openai)
-#
-# PROTOCOL (precision over spend):
-#  1. selftest (free).  2. probe ONE provider; read the provider dashboard
-#  delta; divide by 5 for cost/episode.  3. Set CAP (agent-side token ceiling;
-#  the harness stops cleanly at the cap) and run `full`.  The cap covers the
-#  AGENT model only -- the tau-bench user simulator bills separately, roughly
-#  the same order; watch the dashboard.  4. Receipts land in
-#  soundgate/evidence/taubench_ext_<provider>_<env>.txt; paste them back.
+
 set -euo pipefail
 cd "$(dirname "$0")/.."
 E2E=soundgate/e2e
@@ -27,7 +8,7 @@ RES=soundgate/results
 mkdir -p "$EV" "$RES"
 [ -f soundgate/.env ] && set -a && . soundgate/.env && set +a
 
-agent_args() {  # agent_args <provider> -> MODEL PROVIDER USERM USERP
+agent_args() {
   case "$1" in
     openai)    echo "gpt-4o openai gpt-4o-mini openai";;
     deepseek)  echo "deepseek-chat deepseek deepseek-chat deepseek";;
@@ -37,7 +18,7 @@ agent_args() {  # agent_args <provider> -> MODEL PROVIDER USERM USERP
   esac
 }
 
-run_env() {  # run_env <provider> <env> <start> <end> <cap> <tag>
+run_env() {
   read -r MODEL PROV USERM USERP < <(agent_args "$1")
   python3 "$E2E/taubench_exposure.py" run \
     --env "$2" --provider "$PROV" --model "$MODEL" \
@@ -63,6 +44,7 @@ case "$cmd" in
     echo "== now: dashboard delta / 5 = cost per episode; choose CAP and run 'full' =="
     ;;
   full)
+
     p="${1:?full which provider?}"; : "${CAP:?set CAP=<agent-token ceiling>}"
     echo "== FULL: $p retail 5..115 then airline 0..50, agent-token cap $CAP per environment (2x CAP across both) =="
     run_env "$p" retail 5 115 "$CAP" full

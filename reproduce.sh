@@ -51,7 +51,7 @@ eq() { # eq LABEL GOT WANT
 log "Phase 1: Locating artifacts"
 need git; need python3
 ROOT="${SOUNDGATE_DIR:-$(pwd)}"
-# Optional clone (set SOUNDGATE_REPO=user/repo to fetch instead of using a local tree)
+
 if [[ -n "${SOUNDGATE_REPO:-}" && ! -e "$ROOT/soundgate" && ! -e "$ROOT/Cargo.toml" ]]; then
   log "  cloning https://github.com/$SOUNDGATE_REPO into $ROOT"
   git clone --quiet --depth=1 "https://github.com/$SOUNDGATE_REPO.git" "$ROOT" || fail "clone"
@@ -71,10 +71,10 @@ log "  evidence: $EVID"
 log "  results:  $RESULTS"
 log "  formal:   ${TLA:-<not found>}"
 
-# ---------------------------------------------------------------- Phase 2: audit
+# Phase 2: audit
 log "Phase 2: Paper-number audit (committed artifacts vs claimed values)"
 
-# --- Experiment A: live end-to-end leak (abstract, Table expA) ---------------
+# Experiment A: live end-to-end leak (abstract, Table expA)
 # 215/1,200 unmediated across the four FW-A arms; 0/1,200 mediated; plus the
 # cross-runtime reproductions FW-B 121/300 and FW-F 143/300. Recomputed from raw
 # JSONL by the canonical script.
@@ -94,7 +94,7 @@ else
   fail "ExpA: scripts/recompute_expA.py not found under $CRATE"
 fi
 
-# --- Pause sweep: leak is pause-invariant unmediated, zero mediated ----------
+# Pause sweep: leak is pause-invariant unmediated, zero mediated
 PS="$EVID/pause_sweep.txt"
 if [[ -f "$PS" ]]; then
   UNMED_LEAK=$(grep -cE '20/20 leaked' "$PS"); MED_ZERO=$(grep -cE '0/20 leaked' "$PS")
@@ -102,7 +102,7 @@ if [[ -f "$PS" ]]; then
   eq "Pause sweep FW-A: mediated 0/20 at all 5 pauses"    "$MED_ZERO"  "5"
 else fail "pause_sweep.txt missing"; fi
 
-# --- Exposure study: Llama-Together arm (de-confound) ------------------------
+# Exposure study: Llama-Together arm (de-confound)
 if [[ -f "$EXPO_FILE" ]]; then
   read -r EXP_TOTAL EXP_CLEAN < <(python3 - "$EXPO_FILE" <<'PY'
 import json,sys
@@ -120,7 +120,7 @@ PY
   eq "Exposure Llama-Together compound_cleanup (57)"   "$EXP_CLEAN" "57"
 else skip "exposure Llama-Together JSONL not found (checked $EXPO); exposure arm audit skipped"; fi
 
-# --- tau-bench ecological arm: hard null 0/71 --------------------------------
+# tau-bench ecological arm: hard null 0/71
 TAU=$(python3 - "$RESULTS" <<'PY'
 import json,glob,sys
 gated=benign=0
@@ -136,7 +136,7 @@ PY
 )
 eq "tau-bench ecological arm hard null (0/71)" "$TAU" "0/71"
 
-# --- R1-2 extension: three models, near-full sets, depth arm -----------------
+# R1-2 extension: three models, near-full sets, depth arm
 R12="$(find_one f r1_2_summary.txt '*/evidence/*')"
 if [[ -n "$R12" ]]; then
   read -r X_BEN X_SIB X_POOL X_DEPTH X_FILES < <(python3 - "$R12" <<'PY'
@@ -159,7 +159,7 @@ else
   fail "r1_2_summary.txt: receipt missing (run scripts/r1_2_summarize.py)"
 fi
 
-# --- R1 randomized structural sweep: leak by relation class ------------------
+# R1 randomized structural sweep: leak by relation class
 R1F=$(find_one f "results_fwa.jsonl")
 if [[ -n "$R1F" ]]; then
   read -r R1_SAME R1_LATER R1_DESC < <(python3 - "$R1F" <<'PY'
@@ -180,7 +180,7 @@ PY
   eq "R1 sweep: gate-descendant leak (0/363)"             "$R1_DESC"  "0/363"
 else skip "R1 randgraph results_fwa.jsonl not found; structural-sweep audit skipped"; fi
 
-# --- R2 multi-effect prevalence receipts (tau-bench gold solutions) -----------
+# R2 multi-effect prevalence receipts (tau-bench gold solutions)
 PREV=$(find_one d "prevalence")
 if [[ -n "$PREV" ]] && grep -rqs "45/115" "$PREV" && grep -rqs "15/50" "$PREV" \
    && grep -rqs "41/115" "$PREV" && grep -rqs "14/50" "$PREV"; then
@@ -189,7 +189,7 @@ else
   skip "prevalence/ receipts NOT committed -- paper cites 45/115 and 15/50; commit tau_extract.py outputs before submission"
 fi
 
-# --- Landlock path-granular confinement (enforcing-kernel receipt) -----------
+# Landlock path-granular confinement (enforcing-kernel receipt)
 LL="$EVID/landlock_workdir.txt"
 if [[ -f "$LL" ]]; then
   if grep -q -- "-> ENFORCING" "$LL" && grep -q "LANDLOCK VERDICT: TIGHTENED" "$LL" \
@@ -202,7 +202,7 @@ if [[ -f "$LL" ]]; then
   fi
 else skip "landlock_workdir.txt missing; Landlock rung unevaluated"; fi
 
-# --- Mediation linter at deployment scale ------------------------------------
+# Mediation linter at deployment scale
 MLM="$(find_one f mediation_lint_manytool.txt '*/evidence/*')"
 if [[ -n "$MLM" ]]; then
   read -r ML_D ML_Y ML_FP ML_RES < <(python3 - "$MLM" <<'PY'
@@ -222,7 +222,7 @@ else
   fail "mediation_lint_manytool.txt: receipt missing"
 fi
 
-# --- Differential + exhaustive conformance ----------------------------------
+# Differential + exhaustive conformance
 grep -q "12000000 operations" "$EVID/conformance.txt" 2>/dev/null \
   && ok "Differential conformance: 12,000,000 ops, model==code every verdict" \
   || fail "conformance.txt: '12000000 operations' not found"
@@ -230,7 +230,7 @@ grep -q "729 reachable states x 20 transitions = 14580 checked, 0 divergences" "
   && ok "Bounded-exhaustive: 729 states x 20 = 14,580 transitions, 0 divergences" \
   || fail "exhaustive_conformance.txt: 14580/0-divergence line not found"
 
-# --- Formal receipts: TLC state counts, TLAPS obligations, Verus, Loom -------
+# Formal receipts: TLC state counts, TLAPS obligations, Verus, Loom
 tlc() { grep -oE "[0-9,]+ distinct states found" "$1" 2>/dev/null | tail -1 | grep -oE "[0-9,]+" | tr -d ','; }
 if [[ -n "$TLA" ]]; then
   eq "TLC exhaustive 2x2 (729)"          "$(tlc "$TLA/tlc_2x2.txt")"       "729"
@@ -246,7 +246,7 @@ grep -q "11 verified, 0 errors" "${VERUS_TXT:-/dev/null}" 2>/dev/null \
 LOOM_OK=$(grep -cE 'test .* \.\.\. ok' "$EVID/loom.txt" 2>/dev/null || echo 0)
 eq "Loom: 3 concurrent-Rust models pass" "$LOOM_OK" "3"
 
-# --- Mutation adequacy + protocol fuzz --------------------------------------
+# Mutation adequacy + protocol fuzz
 grep -q "5/5 property-violating mutations caught" "$EVID/mutation_score.txt" 2>/dev/null \
   && ok "Mutation adequacy: 5/5 property mutations caught (4 exhaustive + 1 loom)" \
   || fail "mutation_score.txt: '5/5 ... caught' not found"
@@ -255,13 +255,13 @@ FAILOPEN=$(grep -c "oracle O1 (fail-closed, zero fail-open verdicts): PASS" "$EV
 eq "Fuzz: 180,651 malformed inputs driven"      "${FUZZ_N:-?}" "180651"
 eq "Fuzz: zero fail-open (oracle O1 PASS)"       "$FAILOPEN"    "1"
 
-# --- Emulated-WAN Raft sweep (netem) ----------------------------------------
+# Emulated-WAN Raft sweep (netem)
 NET0=$(grep -E 'raft-3node' "$EVID/netem_raft.txt" 2>/dev/null | grep -oE 'thpt_adm_per_s=[0-9]+' | grep -oE '[0-9]+' | sort -rn | head -1)
 NET10=$(grep -E 'raft-3node,clients=1,' "$EVID/netem_raft.txt" 2>/dev/null | grep -oE 'thpt_adm_per_s=[0-9]+' | grep -oE '[0-9]+' | sort -n | head -1)
 [[ -n "$NET0"  ]] && ok "netem WAN sweep present: peak ${NET0} adm/s (RTT~0), single-client floor ${NET10:-?} adm/s (RTT~10ms)" \
                   || fail "netem_raft.txt: throughput rows not found"
 
-# --- Replicated tier: failover + fault-injection suite ----------------------
+# Replicated tier: failover + fault-injection suite
 FIA_DIR="$EVID"
 RFO="$(find_one f raft_failover.txt)"
 if [[ -n "$RFO" ]] && grep -q "RESULT: PASS" "$RFO"; then
@@ -318,26 +318,26 @@ for s in faultinject_raft.sh start_soundgate_cluster.sh mock_cluster.py; do
 done
 eq "Fault harness committed (suite + cluster script + mock)" "$FI_SCRIPTS/3" "3/3"
 
-# --- Real-endpoint webhook demo ---------------------------------------------
+# Real-endpoint webhook demo
 grep -q "SoundGate delivered zero POSTs" "$EVID/webhook_leak_demo.txt" 2>/dev/null \
   && ok "Webhook demo: unmediated POST hit endpoint during pause; mediated delivered 0" \
   || fail "webhook_leak_demo.txt: verdict line not found"
 
 [[ $AUDIT_ONLY -eq 1 ]] && { echo; log "Audit-only complete"; [[ $FAIL -eq 0 ]] && printf "\033[1;32mAll audit checks passed.\033[0m\n" || { printf "\033[1;31m%d checks failed.\033[0m\n" "$FAIL"; exit 1; }; exit 0; }
 
-# --------------------------------------------- Phase 3: build + test Rust crate
+#  Phase 3: build + test Rust crate
 log "Phase 3: Rust crate build + test (offline, no API keys)"
 need cargo; need rustc
 cd "$CRATE"
 if cargo build --release --quiet 2>&1 | tail -3; then ok "cargo build --release"; else fail "cargo build"; fi
-# The conformance integration test + property tests need the conformance feature
-# (integration tests build the lib with default features only otherwise).
+
 if cargo test --release --features conformance --quiet 2>&1 | tail -8; then
   ok "cargo test --features conformance (property1-4, g1/i1 invariants, WAL replay, conformance)"
 else
   fail "cargo test --features conformance"
 fi
 log "  cargo bench --bench admission (paper: sub-microsecond admission; ~53us round-trip incl. transport)"
+
 if cargo bench --bench admission --quiet >/tmp/_sg_bench.log 2>&1; then
   grep -E "submit|decide|time:" /tmp/_sg_bench.log | head -6 || true
   ok "admission microbench complete"
@@ -345,25 +345,28 @@ else
   skip "admission bench did not complete (see /tmp/_sg_bench.log)"
 fi
 
-# ------------------------------------------ Phase 4: re-run formal (best-effort)
+#  Phase 4: re-run formal (best-effort)
 if [[ $RUN_FORMAL -eq 1 ]]; then
   log "Phase 4: Re-running formal tools (best-effort; receipts already audited above)"
-  # Loom (needs the crate; exhaustive interleavings of the real Gate)
+
   if RUSTFLAGS="--cfg loom" cargo test --release --features conformance --test loom_gate_test \
        --target-dir target-loom >/tmp/_sg_loom.log 2>&1; then
     ok "Loom re-run: 3 models pass"
   else skip "Loom re-run did not complete (see /tmp/_sg_loom.log)"; fi
+
   # Verus
   if command -v verus >/dev/null && [[ -f "$(dirname "$VERUS_TXT")/verus/gate_model.rs" ]]; then
     if verus "$(dirname "$VERUS_TXT")/verus/gate_model.rs" >/tmp/_sg_verus.log 2>&1; then
       ok "Verus re-run: verified"; else skip "Verus re-run failed (see /tmp/_sg_verus.log)"; fi
   else skip "verus not installed; using committed verus.txt (audited above)"; fi
+
   # TLC (needs tla2tools.jar on TLC_JAR)
   if command -v java >/dev/null && [[ -n "${TLC_JAR:-}" && -f "$TLA/SoundGate.cfg" ]]; then
     if (cd "$TLA" && java -cp "$TLC_JAR" tlc2.TLC -config SoundGate.cfg SoundGate.tla >/tmp/_sg_tlc.log 2>&1); then
       ok "TLC re-run: 2x2 model exhausted (larger bounds: see paper receipts)"
     else skip "TLC re-run failed (see /tmp/_sg_tlc.log)"; fi
   else skip "TLC skipped (set TLC_JAR=/path/to/tla2tools.jar and install Java to re-run)"; fi
+
   # TLAPS
   if command -v tlapm >/dev/null && [[ -f "$TLA/SoundGate_Proofs.tla" ]]; then
     if (cd "$TLA" && tlapm --toolbox 0 0 SoundGate_Proofs.tla >/tmp/_sg_tlaps.log 2>&1); then
@@ -371,13 +374,12 @@ if [[ $RUN_FORMAL -eq 1 ]]; then
   else skip "tlapm not installed; using committed tlapm.txt (audited above)"; fi
 fi
 
-# ------------------------------------------------ Phase 5: live arms (--live)
+# Phase 5: live arms (--live)
 if [[ $LIVE -eq 1 ]]; then
   log "Phase 5: Live-model arms (re-measures exposure + Experiment A against real models)"
   [[ -n "${OPENAI_API_KEY:-}"    ]] || fail "OPENAI_API_KEY not set"
   [[ -n "${ANTHROPIC_API_KEY:-}" ]] || skip "ANTHROPIC_API_KEY not set (Claude arms will be skipped)"
-  # Small, cheap re-runs that exercise the live path; they WRITE fresh JSONL you
-  # can diff against the committed arms above. Adjust --n upward for full N=100/300.
+
   EA="$(find_one f experiment_a.py '*/e2e/*')"
   if [[ -n "$EA" && -n "${OPENAI_API_KEY:-}" ]]; then
     log "  live Experiment A (FW-A, gpt-4o, small n; the gate must yield 0 mediated leaks)"

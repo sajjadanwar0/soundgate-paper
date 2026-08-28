@@ -48,6 +48,6 @@ def run_chat_pipeline(payload):
     gate_effect("escalate_chat", payload)
     gate_effect("provision_chat", payload)
 
-_thunk = (lambda f: (lambda p: f(p)))(publish_chat)  # effect passed as parameter
+_thunk = (lambda f: (lambda p: f(p)))(publish_chat)
 def dyn_lambda_chat(payload):
-    return _thunk(payload)  # SEEDED-DYNAMIC-BYPASS (closure alias)
+    return _thunk(payload)

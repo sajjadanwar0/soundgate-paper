@@ -1,15 +1,6 @@
-#!/usr/bin/env python3
-"""Regenerate the R1-2 extension receipts from the committed per-run records.
-
-The jsonl files under soundgate/results/ are the single source of truth
-(probe + capped full runs, appended). This tool recomputes every aggregate
-from them and writes canonical receipts to soundgate/evidence/, so the paper,
-the receipts, and the raw records can never drift apart. ORIGINAL_ARM_CONS is
-the original two-model arm's consequential-batch count (0/71 benign-sibling),
-pooled here for the combined null."""
 import glob, json, math, pathlib, sys
 
-ORIGINAL_ARM_CONS = 71  # original arm: 431 tool turns, two models, 0/71
+ORIGINAL_ARM_CONS = 71
 
 def wilson_hi(x, n, z=1.96):
     if n == 0:
@@ -25,11 +16,13 @@ def main() -> int:
     res, ev = root / "results", root / "evidence"
     ev.mkdir(exist_ok=True)
     files = sorted(res.glob("taubench_ext_*.jsonl"))
+
     if len(files) != 4:
         print(f"expected 4 taubench_ext jsonl files, found {len(files)}", file=sys.stderr)
         return 1
     tot_t = tot_c = tot_b = tot_s = 0
     lines = ["# R1-2 extension summary -- recomputed from committed jsonl records"]
+
     for f in files:
         rows = [json.loads(l) for l in open(f)]
         cons = [r for r in rows if r["is_cons_batch"]]
@@ -54,7 +47,9 @@ def main() -> int:
         f"benign_sib={tot_b}/{pooled_n} "
         f"(upper95={wilson_hi(tot_b, pooled_n):.3f})",
     ]
+
     depth = res / "naturalistic_depth_gpt4o.jsonl"
+
     if depth.exists():
         rows = [json.loads(l) for l in open(depth)]
         runs = {}

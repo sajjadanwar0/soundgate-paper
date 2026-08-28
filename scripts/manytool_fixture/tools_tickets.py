@@ -34,7 +34,7 @@ def provision_tickets(payload):
 def gate_effect(name, payload):
     """Sanctioned wrapper: submits to the gate before performing."""
     fn = globals()[name]
-    return fn(payload)  # inside the wrapper: mediated by convention
+    return fn(payload)
 
 def run_tickets_pipeline(payload):
     gate_effect("send_tickets", payload)
@@ -49,10 +49,10 @@ def run_tickets_pipeline(payload):
     gate_effect("provision_tickets", payload)
 
 def legacy_publish_tickets(payload):
-    return publish_tickets(payload)  # SEEDED-STATIC-BYPASS (bare call)
+    return publish_tickets(payload)
 
 class _Client:
     notify_tickets = staticmethod(notify_tickets)
 
 def shim_notify_tickets(payload):
-    return _Client().notify_tickets(payload)  # SEEDED-STATIC-BYPASS (attribute call)
+    return _Client().notify_tickets(payload)

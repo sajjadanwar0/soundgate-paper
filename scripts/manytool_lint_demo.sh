@@ -1,16 +1,12 @@
 #!/usr/bin/env bash
-# manytool_lint_demo.sh -- measure the static mediation linter at deployment
-# scale: a synthetic 60-tool deployment (manytool_fixture/) with 12 seeded
-# bypasses, 8 statically visible (bare + attribute calls) and 4 dynamic
-# (getattr, dict dispatch, alias, closure alias). The linter's claimed
-# boundary -- flags direct calls, blind to dynamic dispatch -- is measured,
-# not asserted. Receipt: ../evidence/mediation_lint_manytool.txt
 set -euo pipefail
 cd "$(dirname "$0")"
 EV=../soundgate/evidence; mkdir -p "$EV"; OUT="$EV/mediation_lint_manytool.txt"
 EFFECTS=$(python3 -c "import sys; sys.path.insert(0,'manytool_fixture');
 from registry import EFFECTS; print(','.join(EFFECTS))")
+
 FINDINGS=$(python3 mediation_lint.py --wrapper gate_effect --effects "$EFFECTS" manytool_fixture/ || true)
+
 python3 - "$OUT" <<PY
 import pathlib, re, sys
 out = pathlib.Path(sys.argv[1])

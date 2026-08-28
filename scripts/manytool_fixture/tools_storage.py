@@ -50,8 +50,8 @@ def run_storage_pipeline(payload):
 
 _REGISTRY = {'x': escalate_storage}
 def dyn_dict_storage(payload):
-    return _REGISTRY['x'](payload)  # SEEDED-DYNAMIC-BYPASS (dict dispatch)
+    return _REGISTRY['x'](payload)
 
 _f = delete_storage
 def dyn_alias_storage(payload):
-    return _f(payload)  # SEEDED-DYNAMIC-BYPASS (alias)
+    return _f(payload)
