@@ -1,17 +1,17 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and extra == 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version == '3.13.*' and extra == 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version == '3.13.*' and extra == 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and extra == 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.13' and extra == 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -121,7 +121,7 @@ dependencies = [
     { name = "frozenlist" },
     { name = "multidict" },
     { name = "propcache" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
     { name = "yarl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/82/78/8ea7308cac6934de8c74a14f3d5f65d1c89287426688be79538d0e5c013d/aiohttp-3.14.1.tar.gz", hash = "sha256:307f2cff90a764d329e77040603fa032db89c5c24fdad50c4c15334cba744035", size = 7955794, upload-time = "2026-06-07T21:09:35.529Z" }
@@ -216,7 +216,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -228,8 +228,8 @@ name = "aiosqlite"
 version = "0.21.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -247,11 +247,11 @@ source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -306,7 +306,7 @@ version = "4.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3b/72/5562aabb8dd7181e8e860622a38bea08d17842b99ecd4c91f84ac95251b0/anyio-4.14.1.tar.gz", hash = "sha256:8d648a3544c1a700e3ff78615cd679e4c5c3f149904287e73687b2596963629e", size = 254831, upload-time = "2026-06-24T20:56:06.017Z" }
 wheels = [
@@ -640,7 +640,7 @@ name = "click"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
 wheels = [
@@ -1401,8 +1401,8 @@ name = "jiter"
 version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6e/c1/0cddc6eb17d4c53a99840953f95dd3accdc5cfc7a337b0e9b26476276be9/jiter-0.14.0.tar.gz", hash = "sha256:e8a39e66dac7153cf3f964a12aad515afa8d74938ec5cc0018adcdae5367c79e", size = 165725, upload-time = "2026-04-10T14:28:42.01Z" }
@@ -1480,11 +1480,11 @@ source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -2023,8 +2023,8 @@ name = "mcp"
 version = "1.26.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -2484,8 +2484,8 @@ name = "opentelemetry-api"
 version = "1.42.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -3183,8 +3183,8 @@ name = "pydantic"
 version = "2.12.5"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -3205,11 +3205,11 @@ source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -3230,8 +3230,8 @@ name = "pydantic-core"
 version = "2.41.5"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -3308,11 +3308,11 @@ source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -3393,8 +3393,8 @@ name = "pydantic-settings"
 version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 dependencies = [
@@ -3438,11 +3438,11 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.13.0"
+version = "2.15.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/02/a5/5197bfd06417837ac079921c66fa6393f1dea3557272a263cebfef69e432/pyjwt-2.15.0.tar.gz", hash = "sha256:b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4", size = 120513, upload-time = "2026-09-23T16:56:00.689Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
+    { url = "https://files.pythonhosted.org/packages/e8/55/40e45bf052ee8ee12a4dfd785519660f8effa7b065442b91646ec6828619/pyjwt-2.15.0-py3-none-any.whl", hash = "sha256:7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8", size = 33680, upload-time = "2026-09-23T16:55:59.241Z" },
 ]
 
 [package.optional-dependencies]
@@ -3627,8 +3627,8 @@ name = "regex"
 version = "2026.1.15"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version == '3.13.*'",
     "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
     "python_full_version < '3.13'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/86/07d5056945f9ec4590b518171c4254a5925832eb727b56d3c38a7476f316/regex-2026.1.15.tar.gz", hash = "sha256:164759aa25575cbc0651bef59a0b18353e54300d79ace8084c818ad8ac72b7d5", size = 414811, upload-time = "2026-01-14T23:18:02.775Z" }
@@ -3722,11 +3722,11 @@ source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
-    "python_full_version >= '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "python_full_version < '3.14' and sys_platform != 'win32' and extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra == 'extra-10-agentprobe-openai-sdk'",
     "extra != 'extra-10-agentprobe-crewai' and extra != 'extra-10-agentprobe-msaf' and extra != 'extra-10-agentprobe-openai-sdk'",
@@ -4031,7 +4031,11 @@ version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/1e/51/8558a3d8e5b6f4bf78c63c8112e86e78b39c6ce821332e7bdd89d2f5099d/soundgate-0.1.0.tar.gz", hash = "sha256:5f8cf384552581ad2f50dfeab49d08e4ce05c0507f9486e33cfef052daf3c8f5", size = 342124, upload-time = "2026-07-08T15:17:23.941Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/51/35dbb88b60ca398d7976ba7443e169b1b4fc4fcd4e45f9a201040f1c1aac/soundgate-0.1.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:ffd85844147c3be277c9f6cfca8170fa000805e9408370a0e7203fd6a91bffb7", size = 277069, upload-time = "2026-07-15T05:54:44.933Z" },
+    { url = "https://files.pythonhosted.org/packages/22/7a/af3939707d6e59b891ab84f4c7ba590edc3a862be3f4cf4f671bec829cf0/soundgate-0.1.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f84eb9b9be8c9efc2a7276f0dc40e6e70e168fa13e16ffee074df695515bb468", size = 292824, upload-time = "2026-07-15T05:54:46.512Z" },
+    { url = "https://files.pythonhosted.org/packages/11/85/621e81562c552ea9f76dda9eef0142142f936b51d6730dcbfde90ffe3824/soundgate-0.1.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c8016bbc849cb30029c011eb27d9fdc8eb23ccc0358cd8c9843291532a42c61b", size = 308870, upload-time = "2026-07-15T05:54:47.808Z" },
     { url = "https://files.pythonhosted.org/packages/1e/33/a03675d143135e84d2a456f0447dffa6fba3d03058626ed0d6057c508c64/soundgate-0.1.0-cp38-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:b0d97e6a7db46914d87276af5cd9a4df45afdc474a3344c4957fc12f2af3af3a", size = 299793, upload-time = "2026-07-08T15:17:19.399Z" },
+    { url = "https://files.pythonhosted.org/packages/01/07/d4d717892d2b1e281c5fbc7bb5ed90bb58e59ef2a2957cd3e93c3bf403a1/soundgate-0.1.0-cp38-abi3-win_amd64.whl", hash = "sha256:9f6480e4d06147b1b81c46194e277dbece812cb29b519cd053f2da82f3819736", size = 211495, upload-time = "2026-07-15T05:54:49.22Z" },
 ]
 
 [[package]]
@@ -4258,7 +4262,7 @@ name = "tqdm"
 version = "4.68.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-msaf') or (extra == 'extra-10-agentprobe-crewai' and extra == 'extra-10-agentprobe-openai-sdk')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/87/d7/0535a28b1f5f24f6612fb3ff1e89fb1a8d160fee0f976e0aa6803862134b/tqdm-4.68.3.tar.gz", hash = "sha256:00dfa48452b6b6cfae3dd9885636c23d3422d1ec97c66d96818cbd5e0821d482", size = 170596, upload-time = "2026-06-17T07:36:52.105Z" }
 wheels = [
