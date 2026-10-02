@@ -50,7 +50,6 @@ Submit(r, k, na) ==
 Decide(r, k, ap) ==
     LET id == <<r, k>> IN
     \/ /\ id \in pending
-
        /\ \/ /\ Fenced(r)
              /\ pending' = pending \ {id}
              /\ UNCHANGED <<released, rejected, cancelled, closed>>

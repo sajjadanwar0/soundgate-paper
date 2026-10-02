@@ -323,6 +323,19 @@ grep -q "SoundGate delivered zero POSTs" "$EVID/webhook_leak_demo.txt" 2>/dev/nu
   && ok "Webhook demo: unmediated POST hit endpoint during pause; mediated delivered 0" \
   || fail "webhook_leak_demo.txt: verdict line not found"
 
+# Sustained soak, WAL-GC under repeated SIGKILL (Access-2026-43496 final files,
+# Reviewer 1 item 6): the receipt must PASS with zero oracle violations, and
+# no closed run may keep a per-identity record after compaction.
+grep -q "^VERDICT PASS (0 violation(s))" "$EVID/soak_wal.txt" 2>/dev/null \
+  && ok "Soak: sustained load + repeated SIGKILL, 0 oracle violations" \
+  || fail "soak_wal.txt: missing or not PASS"
+SOAK_CLOSED=$(grep -oE "closed_runs_with_identity_records=[0-9]+" "$EVID/soak_wal.txt" 2>/dev/null | cut -d= -f2)
+eq "Soak: closed runs keep no per-identity WAL record" "${SOAK_CLOSED:-missing}" "0"
+SOAK_RESTARTS=$(grep -oE "^restarts=[0-9]+" "$EVID/soak_wal.txt" 2>/dev/null | cut -d= -f2)
+eq "Soak: crash-restart cycles (paper Sec. VI-D)" "${SOAK_RESTARTS:-missing}" "72"
+SOAK_OPS=$(grep -oE " ops=[0-9]+" "$EVID/soak_wal.txt" 2>/dev/null | head -1 | cut -d= -f2)
+eq "Soak: operations (paper Sec. VI-D)" "${SOAK_OPS:-missing}" "3431764"
+
 [[ $AUDIT_ONLY -eq 1 ]] && { echo; log "Audit-only complete"; [[ $FAIL -eq 0 ]] && printf "\033[1;32mAll audit checks passed.\033[0m\n" || { printf "\033[1;31m%d checks failed.\033[0m\n" "$FAIL"; exit 1; }; exit 0; }
 
 #  Phase 3: build + test Rust crate

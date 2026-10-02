@@ -107,6 +107,10 @@ class GateClient:
     def cancel(self, run_id: str) -> Verdict:
         return self._roundtrip({"op": "cancel", "run_id": run_id})
 
+    def close_run(self, run_id: str) -> Verdict:
+        """CloseRun: mark the run terminal, fence it, and drop its per-identity state."""
+        return self._roundtrip({"op": "close", "run_id": run_id})
+
     def ping(self) -> Verdict:
         return self._roundtrip({"op": "ping"})
 

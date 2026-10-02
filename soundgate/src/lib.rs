@@ -39,6 +39,10 @@ pub enum Event {
     Released { run_id: String, effect_key: String },
     Rejected { run_id: String, effect_key: String },
     Cancelled { run_id: String },
+    // 2026-10-02 (final files, Access-2026-43496): CloseRun is durable. The
+    // paper's bounded-state claim (Sec. V, deployment obligations) needs the
+    // deployed server, not only the library, to close runs and replay closes.
+    Closed { run_id: String },
 }
 
 #[derive(Debug, Default)]
@@ -189,6 +193,13 @@ impl Gate {
 
     pub fn apply(&mut self, ev: &Event) {
         match ev {
+            // A record for a closed run is dead state: the run fence refuses
+            // every later submit and decide of that run before any identity
+            // lookup, so dropping it changes no verdict. Skipping it keeps
+            // replay exact when a Released was logged after the run's Closed
+            // (the handler logs after releasing the gate lock).
+            Event::Released { run_id, .. } | Event::Rejected { run_id, .. }
+                if self.closed.contains(run_id) => {}
             Event::Released { run_id, effect_key } => {
                 self.released.insert((run_id.clone(), effect_key.clone()));
             }
@@ -196,7 +207,42 @@ impl Gate {
                 self.rejected.insert((run_id.clone(), effect_key.clone()));
             }
             Event::Cancelled { run_id } => self.cancel(run_id),
+            Event::Closed { run_id } => self.close_run(run_id),
         }
+    }
+
+    /// The smallest event log whose replay rebuilds this gate's durable state
+    /// (released, rejected, cancelled, closed), in a deterministic order.
+    /// Pending holds are deliberately not durable: losing a hold is
+    /// conservative and a resubmission re-holds. Used for WAL compaction.
+    pub fn durable_events(&self) -> Vec<Event> {
+        let mut closed: Vec<&String> = self.closed.iter().collect();
+        closed.sort();
+        let mut cancelled: Vec<&String> = self.cancelled.iter().collect();
+        cancelled.sort();
+        let mut released: Vec<&EffectId> = self.released.iter().collect();
+        released.sort();
+        let mut rejected: Vec<&EffectId> = self.rejected.iter().collect();
+        rejected.sort();
+
+        closed
+            .into_iter()
+            .map(|r| Event::Closed { run_id: r.clone() })
+            .chain(cancelled.into_iter().map(|r| Event::Cancelled { run_id: r.clone() }))
+            .chain(released.into_iter().map(|(r, k)| Event::Released {
+                run_id: r.clone(),
+                effect_key: k.clone(),
+            }))
+            .chain(rejected.into_iter().map(|(r, k)| Event::Rejected {
+                run_id: r.clone(),
+                effect_key: k.clone(),
+            }))
+            .collect()
+    }
+
+    /// Number of runs whose fence is a closed-run record (one per closed run).
+    pub fn closed_count(&self) -> usize {
+        self.closed.len()
     }
 }
 
@@ -421,6 +467,85 @@ mod tests {
                     }
                 }
             }
+        }
+    }
+
+    #[test]
+    fn wal_replay_reconstructs_close() {
+        let events = vec![
+            Event::Released { run_id: "r1".into(), effect_key: "pay".into() },
+            Event::Closed { run_id: "r1".into() },
+        ];
+        let mut g = Gate::new();
+        for e in &events {
+            g.apply(e);
+        }
+        assert_eq!(g.state_len(), 0);
+        assert!(g.is_closed("r1"));
+        assert_eq!(g.submit(eff("r1", "pay", false)), Admission::RefusedCancelled);
+        assert_eq!(g.submit(eff("r1", "new", false)), Admission::RefusedCancelled);
+        assert_eq!(g.submit(eff("r2", "pay", false)), Admission::Release);
+    }
+
+    #[test]
+    fn replay_skips_release_logged_after_close() {
+        // The handler appends to the WAL after it drops the gate lock, so a
+        // release decided before a close can land after the Closed record.
+        let events = vec![
+            Event::Closed { run_id: "r1".into() },
+            Event::Released { run_id: "r1".into(), effect_key: "k".into() },
+            Event::Rejected { run_id: "r1".into(), effect_key: "j".into() },
+        ];
+        let mut g = Gate::new();
+        for e in &events {
+            g.apply(e);
+        }
+        assert_eq!(g.state_len(), 0);
+        assert_eq!(g.submit(eff("r1", "k", false)), Admission::RefusedCancelled);
+        assert_eq!(g.decide("r1", "j", true), Admission::RefusedCancelled);
+    }
+
+    #[test]
+    fn durable_events_replay_rebuilds_durable_state() {
+        let mut seed: u64 = 0xD1B54A32D192ED03;
+        let mut rng = || {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            (seed >> 33) as u32
+        };
+        for _ in 0..2000 {
+            let mut g = Gate::new();
+            let runs = ["a", "b", "c", "d"];
+            let keys = ["x", "y", "z"];
+            for _ in 0..60 {
+                let run = runs[(rng() % 4) as usize];
+                let key = keys[(rng() % 3) as usize];
+                match rng() % 7 {
+                    0 | 1 => {
+                        g.submit(eff(run, key, rng() % 2 == 0));
+                    }
+                    2 | 3 => {
+                        g.decide(run, key, rng() % 2 == 0);
+                    }
+                    4 => g.cancel(run),
+                    5 => g.close_run(run),
+                    _ => {}
+                }
+            }
+            let mut r = Gate::new();
+            for e in g.durable_events() {
+                r.apply(&e);
+            }
+            assert_eq!(r.released, g.released);
+            assert_eq!(r.rejected, g.rejected);
+            assert_eq!(r.cancelled, g.cancelled);
+            assert_eq!(r.closed, g.closed);
+            assert_eq!(r.pending_count(), 0);
+            // Replaying the snapshot twice is a no-op (idempotent records).
+            for e in g.durable_events() {
+                r.apply(&e);
+            }
+            assert_eq!(r.released, g.released);
+            assert_eq!(r.closed, g.closed);
         }
     }
 

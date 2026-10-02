@@ -1,0 +1,17 @@
+soundgate WAL soak (sustained load + repeated SIGKILL/restart)
+started=2026-10-02 04:24:35 UTC host=vm kernel=6.18.44-fc-v51 cpus=1
+config: minutes=30.0 segment_s=60.0 workers=8 think_ms=40.0 kill_every=U[20.0,40.0]s plus every segment boundary compact_min=4096 hmac=on seed=20261002
+elapsed_s=1800 segments=30 ops=3431764 runs=330337 ops_per_s=1906
+runs: strict=330001 spanning_restart=336 cancelled=99084 reconnects=2067
+identities_released=1222128
+restarts=72
+ready_s p50=0.297 p95=0.574 max=0.612
+rss_kib min=3100 max=60784 final=60680
+wal_bytes max=19724000 final=18273640
+final_wal_records {'cancelled': 99084, 'closed': 330337}
+closed_runs_with_identity_records=0
+post_recovery_probe: 2000/2000 sampled released identities refused; fresh=release
+strict_mismatch_explained_by_restart=9
+oracle_violations=0
+VERDICT PASS (0 violation(s))
+ready_s per restart: 0.021 0.021 0.031 0.031 0.055 0.078 0.082 0.106 0.107 0.126 0.108 0.127 0.106 0.137 0.136 0.106 0.148 0.143 0.126 0.156 0.240 0.198 0.173 0.228 0.193 0.187 0.209 0.208 0.208 0.290 0.218 0.259 0.242 0.300 0.311 0.280 0.335 0.258 0.309 0.371 0.297 0.321 0.330 0.321 0.320 0.330 0.385 0.394 0.385 0.433 0.360 0.453 0.436 0.569 0.487 0.494 0.526 0.442 0.490 0.507 0.497 0.509 0.535 0.549 0.580 0.533 0.534 0.516 0.574 0.612 0.589 0.579

@@ -228,6 +228,12 @@ impl GateClient {
         self.roundtrip(py, req.to_string())
     }
 
+    // 2026-10-02 (final files): the server now accepts CloseRun over the wire.
+    fn close_run(&self, py: Python<'_>, run_id: &str) -> PyResult<Verdict> {
+        let req = serde_json::json!({ "op": "close", "run_id": run_id });
+        self.roundtrip(py, req.to_string())
+    }
+
     fn ping(&self, py: Python<'_>) -> PyResult<Verdict> {
         self.roundtrip(py, "{\"op\":\"ping\"}".to_string())
     }

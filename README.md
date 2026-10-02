@@ -62,7 +62,7 @@ from them.
             in Agent-Framework Control Primitives},
   author = {Khan, Sajjad},
   year   = {2026},
-  note   = {Artifact: https://github.com/sajjadanwar0/soundgate}
+  note   = {Artifact: https://github.com/sajjadanwar0/soundgate-paper}
 }
 ```
 
