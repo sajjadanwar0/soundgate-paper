@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use soundgate::{Admission, Effect, Event, Gate};
-use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
+use std::fs::{File, OpenOptions, TryLockError};
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -113,7 +113,142 @@ fn compact_wal(path: &str, lines: &[String]) -> std::io::Result<File> {
     std::fs::rename(&tmp, path)?;
     let dir = Path::new(path).parent().filter(|d| !d.as_os_str().is_empty());
     File::open(dir.unwrap_or(Path::new(".")))?.sync_all()?;
-    OpenOptions::new().append(true).open(path)
+    let f = OpenOptions::new().append(true).open(path)?;
+    // The lock lives on the open file, so the rewritten log needs its own.
+    f.try_lock()
+        .map_err(|e| std::io::Error::other(format!("lock after compaction: {e}")))?;
+    Ok(f)
+}
+
+/// Take the exclusive advisory lock a gate holds on its WAL for the life of
+/// the process. A second gate appending to the same log would interleave its
+/// records with ours and each would recover a state neither wrote; it is
+/// refused at startup instead (fail-closed).
+fn lock_wal(f: &File, path: &str) {
+    match f.try_lock() {
+        Ok(()) => {}
+        Err(TryLockError::WouldBlock) => {
+            eprintln!(
+                "soundgate: WAL {path} is locked by another soundgate process; \
+                 refusing to start (fail-closed)"
+            );
+            std::process::exit(1);
+        }
+        Err(TryLockError::Error(e)) => {
+            eprintln!("soundgate: cannot lock WAL {path} ({e}); refusing to start (fail-closed)");
+            std::process::exit(1);
+        }
+    }
+}
+
+/// Recovery barrier (0.1.4). Runs before the listener opens.
+///
+/// Bora, "A Restart Is Not Permission: When an Agent Gate Forgets 'No'"
+/// (Apart Research incident-response sprint, September 2026), showed that the
+/// previous recovery could lose an acknowledged decision across two restarts:
+/// a torn final fragment was ignored but left in the file, the next append
+/// landed on the same line, and the second recovery skipped the merged,
+/// unparsable line as a "torn final record". The barrier makes the on-disk
+/// log a sequence of complete records before a single byte is appended:
+///
+/// 1. the WAL is opened and exclusively locked for the life of the process;
+/// 2. every newline-terminated record must parse, otherwise the gate refuses
+///    to start (a merged or corrupt line is never skipped);
+/// 3. an unterminated tail is completed with its newline if it is a whole
+///    record, or truncated away if it is a fragment (a fragment was never
+///    acknowledged, so dropping it loses no admitted decision);
+/// 4. the repair is fsynced, the records are replayed, and only then does
+///    the caller open the listener.
+///
+/// Returns the locked append handle, the number of replayed records and
+/// whether a close was replayed (which decides compaction at recovery).
+fn recovery_barrier(path: &str, gate: &mut Gate) -> (File, usize, bool) {
+    // Read+write rather than append: the repair may truncate, and a
+    // truncation on an append-only handle is not portable (Windows needs
+    // write access for it). The writer thread is the only writer and the
+    // lock below excludes other processes, so plain writes at the end of
+    // the file are the same as appends.
+    let mut f = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(path)
+        .unwrap_or_else(|e| {
+            eprintln!("soundgate: cannot open WAL {path} ({e}); refusing to start");
+            std::process::exit(1);
+        });
+    lock_wal(&f, path);
+
+    let mut bytes = Vec::new();
+    if let Err(e) = f.seek(SeekFrom::Start(0)).and_then(|_| f.read_to_end(&mut bytes)) {
+        eprintln!("soundgate: I/O error reading WAL ({e}); refusing to start");
+        std::process::exit(1);
+    }
+
+    let complete_len = bytes.iter().rposition(|&b| b == b'\n').map_or(0, |i| i + 1);
+    let (complete, tail) = bytes.split_at(complete_len);
+
+    let mut events: Vec<Event> = Vec::new();
+    for (i, line) in complete.split(|&b| b == b'\n').enumerate() {
+        if line.iter().all(|b| b.is_ascii_whitespace()) {
+            continue;
+        }
+        match serde_json::from_slice::<Event>(line) {
+            Ok(ev) => events.push(ev),
+            Err(e) => {
+                eprintln!(
+                    "soundgate: WAL record {} is unparsable ({}); refusing to start \
+                     with partial fences (fail-closed). Repair or truncate the WAL.",
+                    i + 1,
+                    e
+                );
+                std::process::exit(1);
+            }
+        }
+    }
+
+    if !tail.is_empty() {
+        let repair = if tail.iter().all(|b| b.is_ascii_whitespace()) {
+            f.set_len(complete_len as u64)
+        } else {
+            match serde_json::from_slice::<Event>(tail) {
+                Ok(ev) => {
+                    eprintln!(
+                        "soundgate: WAL tail is a complete record missing its newline; \
+                         terminating it"
+                    );
+                    events.push(ev);
+                    f.write_all(b"\n")
+                }
+                Err(e) => {
+                    eprintln!(
+                        "soundgate: WAL tail is a torn {}-byte fragment ({}); truncating it \
+                         (a fragment was never acknowledged)",
+                        tail.len(),
+                        e
+                    );
+                    f.set_len(complete_len as u64)
+                }
+            }
+        };
+        if let Err(e) = repair.and_then(|_| f.sync_all()) {
+            eprintln!("soundgate: cannot repair WAL tail ({e}); refusing to start (fail-closed)");
+            std::process::exit(1);
+        }
+    }
+    // After a truncation the cursor can sit past the new end; a write there
+    // would leave a hole of NUL bytes. Every later append starts at the end.
+    if let Err(e) = f.seek(SeekFrom::End(0)) {
+        eprintln!("soundgate: cannot position WAL for append ({e}); refusing to start");
+        std::process::exit(1);
+    }
+
+    let mut saw_closed = false;
+    for ev in &events {
+        saw_closed |= matches!(ev, Event::Closed { .. });
+        gate.apply(ev);
+    }
+    (f, events.len(), saw_closed)
 }
 
 fn wal_writer(path: String, mut f: File, rx: Receiver<WalMsg>) {
@@ -213,6 +348,14 @@ fn wal_writer(path: String, mut f: File, rx: Receiver<WalMsg>) {
             .map_err(|e| e.to_string());
         for (_, ack) in batch {
             let _ = ack.send(res.clone());
+        }
+        if let Err(e) = res {
+            // 0.1.4: a failed or partial append may have left a fragment at
+            // the end of the log, and every later append would land on the
+            // same line. Stop here (fail-closed); the recovery barrier repairs
+            // the tail on the next start, and nothing unacknowledged is lost.
+            eprintln!("soundgate: wal append failed ({e}); stopping (fail-closed)");
+            std::process::exit(1);
         }
     }
 }
@@ -362,56 +505,7 @@ fn main() {
     let mut recovered_records: u64 = 0;
     let wal_file = match &wal_path {
         Some(path) => {
-            let mut recovered = 0usize;
-            let mut saw_closed = false;
-            match File::open(path) {
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-                Err(e) => {
-                    eprintln!("soundgate: cannot open WAL ({e}); refusing to start");
-                    std::process::exit(1);
-                }
-                Ok(f) => {
-                    let lines: Vec<String> = match BufReader::new(f)
-                        .lines()
-                        .collect::<Result<Vec<_>, _>>()
-                    {
-                        Ok(v) => v.into_iter().filter(|l| !l.trim().is_empty()).collect(),
-                        Err(e) => {
-                            eprintln!("soundgate: I/O error reading WAL ({e}); refusing to start");
-                            std::process::exit(1);
-                        }
-                    };
-
-                    for (i, line) in lines.iter().enumerate() {
-                        match serde_json::from_str::<Event>(line) {
-                            Ok(ev) => {
-                                saw_closed |= matches!(ev, Event::Closed { .. });
-                                gate.apply(&ev);
-                                recovered += 1;
-                            }
-                            Err(e) => {
-                                if i + 1 == lines.len() {
-                                    eprintln!(
-                                        "soundgate: ignoring torn final WAL record ({})",
-                                        e
-                                    );
-                                    break;
-                                }
-                                eprintln!(
-                                    "soundgate: WAL record {} of {} is unparsable ({}); \
-                                 mid-log corruption -- refusing to start with partial \
-                                 fences (fail-closed). Repair or truncate the WAL.",
-                                    i + 1,
-                                    lines.len(),
-                                    e
-                                );
-                                std::process::exit(1);
-                            }
-                        }
-                    }
-                }
-            }
-
+            let (f, recovered, saw_closed) = recovery_barrier(path, &mut gate);
             eprintln!("soundgate: recovered {} event(s) from {}", recovered, path);
 
             // Compact at recovery only when the log holds a close: a log with
@@ -419,20 +513,17 @@ fn main() {
             // earlier receipt replays exactly as recorded.
             let f = if saw_closed {
                 let snapshot = snapshot_lines(&gate);
-                let f = compact_wal(path, &snapshot).unwrap_or_else(|e| {
+                let nf = compact_wal(path, &snapshot).unwrap_or_else(|e| {
                     eprintln!("soundgate: cannot compact WAL ({e}); refusing to start");
                     std::process::exit(1);
                 });
+                drop(f);
                 eprintln!("soundgate: wal compacted at recovery: {} -> {} record(s)", recovered, snapshot.len());
                 recovered_records = snapshot.len() as u64;
-                f
+                nf
             } else {
                 recovered_records = recovered as u64;
-                OpenOptions::new()
-                    .create(true)
-                    .append(true)
-                    .open(path)
-                    .expect("open wal for append")
+                f
             };
             Some(f)
         }
@@ -467,8 +558,9 @@ fn main() {
     });
 
     let listener = TcpListener::bind(&addr).expect("bind");
+    let bound = listener.local_addr().map(|a| a.to_string()).unwrap_or(addr);
 
-    eprintln!("soundgate listening on {} ({})", addr,
+    eprintln!("soundgate listening on {} ({})", bound,
               if wal_path.is_some() { "durable: WAL" } else { "in-memory" });
 
     for stream in listener.incoming() {

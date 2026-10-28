@@ -64,3 +64,18 @@ decided, reject-stickiness, dedup-on-replay, fence-on-cancel), cross-run key
 independence, HMAC-authenticated decisions, forged-MAC rejection, and the
 decision-tag byte format. All pass. The PyO3 `GateClient` sends the identical
 protocol and reuses `hmac.rs`, so the same guarantees apply.
+
+## Changelog
+
+### 0.1.4
+- **WAL recovery barrier** in the `soundgate` server: the log is exclusively
+  locked, every complete record must parse (fail-closed otherwise), a torn
+  final fragment is truncated or a newline-less whole record is completed,
+  and the repair is fsynced before replay and before the listener opens. A
+  failed append now stops the process instead of leaving a fragment.
+- Fixes the loss of an acknowledged rejection or release across two restarts
+  reported by Cenab Batu Bora (Georgia Tech), *A Restart Is Not Permission:
+  When an Agent Gate Forgets "No"* (Apart Research, September 2026). His
+  byte-prefix sweep ships as a regression test (`tests/wal_recovery_barrier.rs`).
+- The server prints the address it actually bound, so `127.0.0.1:0` works.
+- The in-process Python gate is unchanged.

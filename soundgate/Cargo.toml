@@ -1,6 +1,6 @@
 [package]
 name = "soundgate"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 description = "Environment-external effect gate for agent-framework stop primitives"
 license = "MIT"
