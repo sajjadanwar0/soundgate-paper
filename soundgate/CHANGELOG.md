@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- `pyo3` 0.23 → 0.29 (RUSTSEC-2025-0020, RUSTSEC-2026-0177). The binding
+  keeps `abi3-py38`; `Python::allow_threads` became `Python::detach`, and
+  `Verdict` opts into `from_py_object` explicitly. No Python-visible change.
+- `Cargo.lock`: rustls 0.23.46, rustls-webpki 0.103.16, h2 0.4.20,
+  crossbeam-epoch 0.9.21, tokio 1.54.1 (RustSec advisories against the
+  previous pins; none reachable from the shipped binary or wheel). `cargo
+  audit` reports no vulnerabilities.
+
 ## 0.1.4 — 2026-10-28
 
 ### Fixed

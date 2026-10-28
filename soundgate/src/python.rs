@@ -22,7 +22,9 @@ fn verdict_str(a: &Admission) -> &'static str {
     }
 }
 
-#[pyclass(frozen, module = "soundgate")]
+// `from_py_object`: `__richcmp__` extracts a `Verdict` from the other operand;
+// pyo3 0.29 makes that derive opt-in for `Clone` pyclasses.
+#[pyclass(frozen, module = "soundgate", from_py_object)]
 #[derive(Clone)]
 pub struct Verdict {
     #[pyo3(get)]
@@ -141,7 +143,9 @@ pub struct GateClient {
 
 impl GateClient {
     fn roundtrip(&self, py: Python<'_>, line: String) -> PyResult<Verdict> {
-        py.allow_threads(|| {
+        // pyo3 0.29: `detach` is the renamed `allow_threads` (release the
+        // interpreter lock while the socket round-trip blocks).
+        py.detach(|| {
             let mut c = self.conn.lock().unwrap();
 
             c.get_mut()

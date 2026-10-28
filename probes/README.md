@@ -27,3 +27,15 @@ uv run python -m agentprobe.langgraph_probes    # a single framework's probes
 ```
 Managed with **uv**; `uv.lock` is committed for a frozen resolution. CrewAI runs
 in a separate venv because of dependency conflicts (see `pyproject.toml`).
+
+`results/env/freeze-*.txt` are the environments of record for the matrix.
+On 2026-10-28 `uv.lock` was re-resolved for security advisories in transitive
+packages only (aiohttp, anyio, banks, certifi, cryptography, filelock, mcp,
+multidict, nltk, oauthlib, opentelemetry-api, pillow, pyjwt, setuptools,
+tinytag, urllib3, uv, yarl); every framework pin in `pyproject.toml` is
+unchanged, and the verdict guards and all six transcripts reproduce identically
+under the new lock. What stays flagged is held by the subject pins:
+`crewai==1.15.1` requires `chromadb~=1.1.0`, `json-repair~=0.25.2`,
+`mcp~=1.26.0`, `opentelemetry-api~=1.42.0` and (via crewai-cli) `uv~=0.11.6`,
+and `langgraph-sdk==0.4.2` is part of the FW-A pin set. Moving those means
+re-recording the FW-E or FW-A row.
