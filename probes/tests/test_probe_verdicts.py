@@ -46,9 +46,14 @@ def test_langgraph_verdicts():
     }
 
 def test_llamaindex_verdicts():
+    # 2026-10-28: the FW-B row was completed on 2026-07-04 with the 4-probe
+    # suite (results/MATRIX.md, results/llamaindex.txt); this guard still
+    # pinned the original 2-probe map and failed on every fresh checkout.
     assert run_suite("agentprobe.llamaindex_probes") == {
         "parallel_approval_leak": "VIOLATION",
         "timeout_zombie": "clean/contrast",
+        "cancellation[cancel_run:worker_thread]": "VIOLATION",
+        "replay[context_restore]": "clean/contrast",
     }
 
 def test_msaf_verdicts():
