@@ -1,1 +1,0 @@
-"""Incident corpus for the Stop-Means-Stop paper (prevalence evidence)."""
