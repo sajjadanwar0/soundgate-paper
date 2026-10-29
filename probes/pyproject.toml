@@ -15,7 +15,7 @@ dependencies = [
     "langgraph==1.2.7",
     "langgraph-checkpoint==4.1.1",
     "langgraph-prebuilt==1.1.0",
-    "langgraph-sdk==0.4.2",
+    "langgraph-sdk==0.4.6",
     "llama-index-core==0.14.23",
     "openai>=2.44.0",
     "soundgate>=0.1.0",
